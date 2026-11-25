@@ -1,0 +1,94 @@
+/* base.css — elementos gerais, cabeçalho, rodapé e tipografia */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--texto);
+  background: var(--fundo);
+  overflow-x: hidden;
+}
+img, svg { max-width: 100%; display: block; }
+a { color: var(--verde-escuro); }
+h1, h2, h3, h4 { color: var(--texto-titulo); line-height: 1.12; margin: 0 0 .5em; letter-spacing: -0.02em; }
+p { margin: 0 0 1em; }
+
+.container { width: 100%; max-width: var(--largura-max); margin: 0 auto; padding: 0 var(--gutter); }
+
+.pular-conteudo { position: absolute; left: -9999px; }
+.pular-conteudo:focus { left: 16px; top: 16px; z-index: 100; background: #fff; color: #000; padding: 8px 12px; }
+
+:focus-visible { outline: 3px solid var(--verde); outline-offset: 2px; }
+
+/* ---------- Cabeçalho (igual ao site do curso) ---------- */
+.cabecalho {
+  background: var(--azul-noite);
+  border-bottom: 20px solid var(--azul-noite-2);
+  box-shadow: 0 18px 30px -18px rgba(12, 28, 40, .35);
+  position: relative;
+  z-index: 10;
+}
+.cabecalho .container {
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: var(--altura-cabecalho); gap: 24px;
+}
+.marca { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.marca img { height: 66px; width: auto; }
+.marca .marca-app {
+  color: var(--texto-sobre-escuro-2); font-size: 12px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; border-left: 1px solid #2A3B48; padding-left: 14px; line-height: 1.4; white-space: nowrap;
+}
+.menu { display: flex; gap: 34px; list-style: none; margin: 0; padding: 0; }
+.menu a {
+  color: var(--texto-sobre-escuro); text-decoration: none; font-weight: 700;
+  font-size: 15px; letter-spacing: .06em; text-transform: uppercase;
+  padding: 10px 0; position: relative; white-space: nowrap;
+}
+.menu a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: var(--verde); transform: scaleX(0); transition: transform .2s;
+}
+.menu a:hover::after, .menu a[aria-current="page"]::after { transform: scaleX(1); }
+.menu .externo::before { content: "↗ "; font-weight: 400; color: var(--verde); }
+
+.botao-menu {
+  display: none; background: none; border: 1px solid #2A3B48; color: #fff;
+  font: inherit; font-weight: 700; font-size: 14px; letter-spacing: .06em; text-transform: uppercase;
+  padding: 8px 12px; cursor: pointer;
+}
+
+@media (max-width: 960px) {
+  .botao-menu { display: block; }
+  .menu {
+    display: none; position: absolute; left: 0; right: 0; top: 100%;
+    flex-direction: column; gap: 0; background: var(--azul-noite-2); padding: 8px var(--gutter) 16px;
+  }
+  .menu.aberto { display: flex; }
+  .menu a { display: block; padding: 12px 0; }
+  .marca .marca-app { display: none; }
+  .marca img { height: 44px; }
+}
+
+/* ---------- Rótulos e títulos de seção ---------- */
+.rotulo {
+  display: inline-block; color: var(--verde-escuro); font-size: 14px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 18px;
+}
+.destaque { color: var(--verde); }
+
+/* ---------- Rodapé ---------- */
+.rodape { background: var(--azul-noite-2); color: var(--texto-sobre-escuro-2); font-size: 15px; margin-top: 0; }
+.rodape .container { padding-top: 56px; padding-bottom: 32px; }
+.rodape-grade { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+.rodape h2 { color: #fff; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+.rodape a { color: var(--texto-sobre-escuro-2); text-decoration: none; }
+.rodape a:hover { color: #fff; text-decoration: underline; }
+.rodape ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rodape .instituicao strong { display: block; color: #fff; font-size: 18px; }
+.rodape .linha-final {
+  border-top: 1px solid #26394A; margin-top: 40px; padding-top: 20px;
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px;
+}
+@media (max-width: 760px) { .rodape-grade { grid-template-columns: 1fr; gap: 28px; } }

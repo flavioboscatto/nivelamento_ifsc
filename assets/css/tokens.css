@@ -1,0 +1,39 @@
+/* tokens.css — cores e medidas medidas no site do curso (docs/06_IDENTIDADE_VISUAL.md, 6.2) */
+:root {
+  /* Superfícies escuras (cabeçalho, rodapé) */
+  --azul-noite: #0C1C28;
+  --azul-noite-2: #14232F;
+
+  /* Verdes */
+  --verde: #75B14D;          /* destaques grandes, ícones, linhas — nunca texto pequeno */
+  --verde-escuro: #3C723D;   /* rótulos e texto verde */
+  --verde-if: #549E4D;
+
+  /* Texto */
+  --texto-titulo: #182128;
+  --texto: #637078;
+  --texto-sobre-escuro: #FFFFFF;
+  --texto-sobre-escuro-2: #B9C3CA;
+
+  /* Superfícies e linhas */
+  --fundo: #FFFFFF;
+  --fundo-alt: #F5F7F6;
+  --borda: #DDE3DF;
+
+  /* Estados */
+  --ok: #3C723D;
+  --alerta: #94600F;
+  --erro: #B82F29;
+
+  /* Tipografia (confirmar família do site na etapa 2 — ver doc 6.3) */
+  --fonte: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Medidas */
+  --largura-max: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --altura-cabecalho: 96px;
+  --raio: 0px;               /* o site usa cantos retos */
+}
+
+/* Sem modo escuro: o site do curso é claro e o fundo da página é sempre branco (decisão D20). */
+:root { color-scheme: light; }

@@ -1,0 +1,22 @@
+# Netlify — site estático, sem etapa de build
+[build]
+  publish = "."
+  command = ""
+
+# Não publicar documentação interna nem testes como páginas
+[[redirects]]
+  from = "/tests/*"
+  to = "/404.html"
+  status = 404
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

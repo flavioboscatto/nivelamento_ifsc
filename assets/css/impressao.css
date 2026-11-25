@@ -1,0 +1,10 @@
+/* impressao.css — relatório: fontes pretas, tabelas sem preenchimento, sem cores da tela */
+@media print {
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  :root { --verde: #000; --verde-escuro: #000; --texto: #000; --texto-titulo: #000; --borda: #000; --fundo: #fff; --fundo-alt: #fff; }
+  body { font-size: 11pt; color: #000; background: #fff; }
+  .cabecalho, .rodape, .nao-imprimir, .botao, nav { display: none !important; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 0.5pt solid #000; background: none !important; color: #000 !important; padding: 2pt 4pt; }
+  a { color: #000; text-decoration: none; }
+}

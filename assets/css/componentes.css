@@ -1,0 +1,82 @@
+/* componentes.css — página inicial, cartões, botões e avisos */
+
+/* ---------- Apresentação ---------- */
+.apresentacao { padding: 88px 0 72px; }
+.apresentacao .container { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }
+.apresentacao h1 { font-size: clamp(40px, 5.2vw, 64px); font-weight: 800; letter-spacing: -0.035em; margin-bottom: 28px; }
+.apresentacao .lead { font-size: 19px; max-width: 36em; }
+.lista-recursos { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 12px; }
+.lista-recursos li { display: flex; gap: 12px; align-items: flex-start; color: var(--texto-titulo); font-weight: 500; }
+.lista-recursos svg { flex: none; width: 22px; height: 22px; margin-top: 2px; stroke: var(--verde); }
+
+.ilustracao { margin: 0; border: 1px solid var(--borda); padding: 28px 20px 20px; background: var(--fundo); }
+.ilustracao svg { width: 100%; height: auto; }
+.ilustracao figcaption { font-size: 15px; margin-top: 14px; text-align: center; }
+.ilustracao figcaption .formula { display: inline-block; margin: 2px 8px; }
+.ilustracao .formula { font-weight: 700; color: var(--texto-titulo); }
+
+/* ---------- Escolha do método ---------- */
+.metodos { padding: 24px 0 96px; }
+.metodos .cab-secao { max-width: 46em; margin-bottom: 40px; }
+.metodos h2 { font-size: clamp(32px, 3.6vw, 44px); font-weight: 800; }
+.grade-metodos { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--borda); }
+.cartao-metodo { padding: 44px 40px 40px; display: flex; flex-direction: column; }
+.cartao-metodo + .cartao-metodo { border-left: 1px solid var(--borda); }
+.cartao-metodo .icone { width: 76px; height: 76px; stroke: var(--verde); margin-bottom: 22px; }
+.cartao-metodo h3 { font-size: 28px; font-weight: 800; margin-bottom: 12px; }
+.cartao-metodo p { margin-bottom: 22px; }
+.modos { list-style: none; padding: 0; margin: 0 0 32px; display: grid; gap: 0; border-top: 1px solid var(--borda); }
+.modos li { padding: 11px 0; border-bottom: 1px solid var(--borda); display: flex; justify-content: space-between; gap: 16px; }
+.modos li strong { color: var(--texto-titulo); font-weight: 600; }
+.modos li span { font-size: 14px; text-align: right; }
+.cartao-metodo .acoes { margin-top: auto; display: flex; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 900px) {
+  .apresentacao { padding: 56px 0 48px; }
+  .apresentacao .container { grid-template-columns: 1fr; gap: 40px; }
+  .grade-metodos { grid-template-columns: 1fr; }
+  .cartao-metodo { padding: 32px 22px; }
+  .cartao-metodo + .cartao-metodo { border-left: 0; border-top: 1px solid var(--borda); }
+  .modos li { flex-direction: column; gap: 2px; }
+  .modos li span { text-align: left; }
+}
+
+/* ---------- Botões ---------- */
+.botao {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  font: inherit; font-weight: 700; font-size: 14px; letter-spacing: .04em; text-transform: uppercase;
+  padding: 13px 18px; border: 2px solid var(--verde-escuro); cursor: pointer; border-radius: var(--raio);
+}
+.botao-primario { background: var(--verde-escuro); color: #fff; }
+.botao-primario:hover { background: var(--azul-noite); border-color: var(--azul-noite); }
+.botao-secundario { background: transparent; color: var(--verde-escuro); }
+.botao-secundario:hover { background: var(--fundo-alt); }
+.botao[aria-disabled="true"] { border-color: var(--borda); color: var(--texto); cursor: not-allowed; background: transparent; }
+.etiqueta {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  background: var(--fundo-alt); color: var(--texto); padding: 2px 6px; border: 1px solid var(--borda);
+}
+
+/* ---------- Como funciona ---------- */
+.como-funciona { background: var(--fundo-alt); padding: 80px 0; border-top: 1px solid var(--borda); }
+.passos { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; counter-reset: passo; }
+.passos li { counter-increment: passo; }
+.passos li::before {
+  content: counter(passo, decimal-leading-zero); display: block; font-size: 44px; font-weight: 800;
+  color: var(--verde); letter-spacing: -0.03em; line-height: 1; margin-bottom: 14px;
+}
+.passos h3 { font-size: 21px; }
+.privacidade {
+  margin-top: 48px; display: flex; gap: 14px; align-items: flex-start;
+  border-left: 4px solid var(--verde); padding: 4px 0 4px 18px; color: var(--texto-titulo);
+}
+.privacidade svg { flex: none; width: 24px; height: 24px; stroke: var(--verde-escuro); }
+@media (max-width: 760px) { .passos { grid-template-columns: 1fr; gap: 28px; } }
+
+/* ---------- Páginas em construção ---------- */
+.em-construcao { padding: 88px 0 120px; }
+.em-construcao h1 { font-size: clamp(36px, 4.6vw, 56px); font-weight: 800; }
+.aviso {
+  border: 1px solid var(--borda); border-left: 4px solid var(--alerta); padding: 18px 22px; margin-top: 28px; max-width: 46em;
+  color: var(--texto-titulo);
+}

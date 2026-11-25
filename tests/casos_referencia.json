@@ -1,0 +1,664 @@
+{
+  "_descricao": "Casos de referência recalculados em 2026-11-25. Alturas em m, tolerâncias/erros em mm. Ver docs/07_CASOS_DE_TESTE.md.",
+  "tolerancia_numerica": {
+    "altura_m": 0.0005,
+    "mm": 0.05
+  },
+  "geometrico": [
+    {
+      "id": "G01",
+      "fonte": "NBR 13133:2021 Anexo F.2",
+      "norma": "NBR13133_2021",
+      "H_RN": 9.315,
+      "sigma_RN_m": 0.0034,
+      "sigma_L_m_por_m": 2e-05,
+      "caderneta": [
+        {
+          "est": "01",
+          "ponto": "RN80",
+          "re": 1.335,
+          "dh": 60.325
+        },
+        {
+          "est": "01",
+          "ponto": "A1",
+          "vante": 1.511,
+          "dh": 55.078
+        }
+      ],
+      "esperado": {
+        "H_A1": 9.139,
+        "sigma_A1_m": 0.00377
+      }
+    },
+    {
+      "id": "G04",
+      "fonte": "Altimetria Aplicada, Exercício I (Tab. 7)",
+      "norma": "NBR13133_2021",
+      "obs_tolerancia": "tolerâncias 2021 em docs/07 7.1",
+      "tipo": "transporte_ida_volta",
+      "H_partida": 9.315,
+      "ponto_chegada": "RN2",
+      "ida": {
+        "re": [
+          1.875,
+          0.889,
+          1.009,
+          1.234,
+          1.198
+        ],
+        "vante": [
+          1.503,
+          2.116,
+          0.784,
+          1.604,
+          0.857
+        ],
+        "dh": [
+          40.325,
+          38.093,
+          43.178,
+          49.543,
+          52.972,
+          58.243,
+          29.548,
+          30.478,
+          22.765,
+          17.987
+        ]
+      },
+      "volta": {
+        "re": [
+          0.987,
+          0.678,
+          1.542,
+          1.532
+        ],
+        "vante": [
+          1.479,
+          0.756,
+          0.975,
+          0.876
+        ],
+        "dh": [
+          25.767,
+          31.005,
+          45.528,
+          41.806,
+          59.289,
+          63.543,
+          53.096,
+          48.514
+        ]
+      },
+      "esperado": {
+        "H_RN2_ida": 8.656,
+        "H_RN1_volta": 9.309,
+        "erro_mm": -6.0,
+        "K_km": 0.383132,
+        "H_RN2_corrigida": 8.659,
+        "tol2021_mm": {
+          "classe1": 3.71,
+          "classe2": 4.95,
+          "classe3": 7.43
+        },
+        "atende2021": {
+          "classe1": false,
+          "classe2": false,
+          "classe3": true
+        }
+      }
+    },
+    {
+      "id": "G05",
+      "fonte": "Altimetria Aplicada, Exercício II (Tab. 8)",
+      "norma": "NBR13133_2021",
+      "obs_tolerancia": "tolerâncias 2021 em docs/07 7.1",
+      "tipo": "transporte_ida_volta",
+      "H_partida": 132.459,
+      "ida": {
+        "re": [
+          1.497,
+          0.879,
+          2.341,
+          0.739,
+          1.378
+        ],
+        "vante": [
+          1.235,
+          1.225,
+          1.891,
+          0.345,
+          0.732
+        ],
+        "dh_total_m": 453.132
+      },
+      "volta": {
+        "re": [
+          1.025,
+          0.799,
+          2.254,
+          0.915,
+          1.085
+        ],
+        "vante": [
+          0.895,
+          2.356,
+          1.813,
+          1.459,
+          0.953
+        ],
+        "dh_total_m": 488.596
+      },
+      "esperado": {
+        "H_RN2_ida": 133.865,
+        "H_RN1_volta": 132.467,
+        "erro_mm": 8.0,
+        "H_RN2_corrigida": 133.861,
+        "tol2021_mm": {
+          "classe1": 4.04,
+          "classe2": 5.39,
+          "classe3": 8.08
+        },
+        "atende2021": {
+          "classe1": false,
+          "classe2": false,
+          "classe3": true
+        }
+      }
+    },
+    {
+      "id": "G06",
+      "fonte": "Altimetria Aplicada, Tab. 9/10 (circuito)",
+      "norma": "NBR13133_2021",
+      "obs_tolerancia": "tolerâncias 2021 em docs/07 7.1",
+      "tipo": "circuito",
+      "H_RN": 6.5,
+      "estacoes": [
+        {
+          "re": 0.975,
+          "intermediarias": {
+            "1": 1.175,
+            "2": 1.692,
+            "3": 1.595
+          },
+          "mudanca": [
+            "A1",
+            1.383
+          ]
+        },
+        {
+          "re": 1.438,
+          "intermediarias": {
+            "4": 0.899,
+            "5": 0.807
+          },
+          "mudanca": [
+            "A2",
+            1.472
+          ]
+        },
+        {
+          "re": 1.408,
+          "intermediarias": {
+            "6": 1.128,
+            "7": 1.508,
+            "8": 1.799
+          },
+          "mudanca": [
+            "A3",
+            1.51
+          ]
+        },
+        {
+          "re": 1.389,
+          "intermediarias": {
+            "9": 1.5,
+            "10": 1.678
+          },
+          "mudanca": [
+            "PS1",
+            1.656
+          ]
+        },
+        {
+          "re": 1.572,
+          "intermediarias": {
+            "11": 1.5,
+            "12": 1.678,
+            "13": 1.462
+          },
+          "mudanca": [
+            "A4",
+            1.456
+          ]
+        },
+        {
+          "re": 1.497,
+          "intermediarias": {
+            "14": 1.5,
+            "15": 1.5,
+            "16": 1.678
+          },
+          "mudanca": [
+            "A5",
+            1.654
+          ]
+        },
+        {
+          "re": 1.674,
+          "intermediarias": {},
+          "mudanca": [
+            "RN2",
+            0.833
+          ]
+        }
+      ],
+      "perimetro_m": 718.254,
+      "esperado": {
+        "H_fecho": 6.489,
+        "erro_mm": -11.0,
+        "C_por_estacao_m": -0.0015714,
+        "corrigidas": {
+          "2": 5.785,
+          "14": 5.811,
+          "16": 5.633
+        },
+        "tol2021_mm": {
+          "classe1": 5.08,
+          "classe2": 6.78,
+          "classe3": 10.17
+        },
+        "atende2021": {
+          "classe1": false,
+          "classe2": false,
+          "classe3": false
+        }
+      }
+    },
+    {
+      "id": "G07",
+      "fonte": "Altimetria Aplicada, Exercício III",
+      "norma": "NBR13133_2021",
+      "obs_tolerancia": "tolerâncias 2021 em docs/07 7.1",
+      "tipo": "circuito",
+      "H_RN": 972.367,
+      "re_mudancas": [
+        1.963,
+        1.246,
+        1.192,
+        1.333,
+        1.282
+      ],
+      "vante_mudancas": [
+        1.372,
+        1.482,
+        1.566,
+        1.656,
+        0.934
+      ],
+      "perimetro_m": 515.928,
+      "esperado": {
+        "H_fecho": 972.373,
+        "erro_mm": 6.0,
+        "C_por_estacao_m": 0.0012,
+        "tol2021_mm": {
+          "classe1": 4.31,
+          "classe2": 5.75,
+          "classe3": 8.62
+        },
+        "atende2021": {
+          "classe1": false,
+          "classe2": false,
+          "classe3": true
+        }
+      }
+    },
+    {
+      "id": "G08",
+      "fonte": "Altimetria Aplicada, Exercício IV",
+      "norma": "NBR13133_2021",
+      "obs_tolerancia": "tolerâncias 2021 em docs/07 7.1",
+      "tipo": "circuito",
+      "H_RN": 972.367,
+      "re_mudancas": [
+        2.819,
+        2.12,
+        2.418,
+        2.246,
+        3.871,
+        0.813
+      ],
+      "vante_mudancas": [
+        2.244,
+        2.172,
+        2.66,
+        2.144,
+        2.901,
+        2.172
+      ],
+      "perimetro_m": 490.5,
+      "esperado": {
+        "H_fecho": 972.361,
+        "erro_mm": -6.0,
+        "C_por_estacao_m": -0.001,
+        "corrigidas": {
+          "JKG87": 972.923,
+          "MPX12": 973.048
+        },
+        "tol2021_mm": {
+          "classe1": 4.2,
+          "classe2": 5.6,
+          "classe3": 8.4
+        },
+        "atende2021": {
+          "classe1": false,
+          "classe2": false,
+          "classe3": true
+        }
+      }
+    }
+  ],
+  "estatistica": [
+    {
+      "id": "S01",
+      "obs": [
+        12.792,
+        12.785,
+        12.783,
+        12.788,
+        12.794,
+        12.791,
+        12.718,
+        12.798,
+        12.8,
+        12.79
+      ],
+      "esperado": {
+        "media": 12.7839,
+        "s": 0.0237,
+        "s_media": 0.0075
+      }
+    },
+    {
+      "id": "S02",
+      "obs": [
+        12.792,
+        12.785,
+        12.783,
+        12.788,
+        12.794,
+        12.791,
+        12.798,
+        12.8,
+        12.79
+      ],
+      "esperado": {
+        "media": 12.7912,
+        "s": 0.0056,
+        "s_media": 0.0019
+      }
+    }
+  ],
+  "trigonometrico": [
+    {
+      "id": "T01",
+      "fonte": "NBR F.4",
+      "sigma_HI_m": 0.023,
+      "Z": "90°03'11\"",
+      "Di": 26.479,
+      "sigma_Di_m": 0.002,
+      "sigma_Z_s": 5,
+      "esperado": {
+        "sigma_H_m": 0.0232,
+        "variancia": 0.0005374
+      }
+    },
+    {
+      "id": "T03",
+      "fonte": "NBR Anexo I (R = 6 360 000 m, k = 0,13)",
+      "visadas": [
+        {
+          "H_partida": 8.378,
+          "Z": "81°01'01\"",
+          "D": 174.364,
+          "i": 1.31,
+          "s": 0.0,
+          "esperado_H": 37.254
+        },
+        {
+          "H_partida": 4.435,
+          "Z": "84°44'42\"",
+          "D": 338.937,
+          "i": 1.63,
+          "s": 0.0,
+          "esperado_H": 37.247
+        },
+        {
+          "H_partida": 2.467,
+          "Z": "85°59'03\"",
+          "D": 474.647,
+          "i": 1.432,
+          "s": 0.0,
+          "esperado_H": 37.236
+        }
+      ],
+      "esperado": {
+        "media": 37.246
+      }
+    }
+  ],
+  "estadimetria": [
+    {
+      "id": "E01",
+      "FS": 1.279,
+      "FI": 1.185,
+      "Z": "91°19'40\"",
+      "C": 100,
+      "esperado": {
+        "DH": 9.395
+      }
+    }
+  ],
+  "taqueometria": [
+    {
+      "id": "Q01",
+      "status": "A CONFERIR PELO PROFESSOR (apostila sem resposta)",
+      "estacao": {
+        "H": 40.034,
+        "X": 1000.0,
+        "Y": 5000.0,
+        "i": 1.57,
+        "Az_ref": 0
+      },
+      "pontos": [
+        {
+          "p": "12",
+          "FS": 1.129,
+          "FM": 1.009,
+          "FI": 0.888,
+          "Z": "95°37'31\"",
+          "Hz": "237°47'55\"",
+          "esperado": {
+            "DH": 23.868,
+            "H": 38.244,
+            "X": 979.803,
+            "Y": 4987.281
+          }
+        },
+        {
+          "p": "13",
+          "FS": 1.167,
+          "FM": 1.007,
+          "FI": 0.849,
+          "Z": "88°22'58\"",
+          "Hz": "301°13'22\"",
+          "esperado": {
+            "DH": 31.775,
+            "H": 41.494,
+            "X": 972.828,
+            "Y": 5016.471
+          }
+        },
+        {
+          "p": "14",
+          "FS": 1.247,
+          "FM": 1.075,
+          "FI": 0.903,
+          "Z": "89°52'46\"",
+          "Hz": "55°32'55\"",
+          "esperado": {
+            "DH": 34.4,
+            "H": 40.601,
+            "X": 1028.366,
+            "Y": 5019.46
+          }
+        },
+        {
+          "p": "15",
+          "FS": 1.329,
+          "FM": 1.166,
+          "FI": 1.002,
+          "Z": "125°22'58\"",
+          "Hz": "11°25'37\"",
+          "esperado": {
+            "DH": 21.736,
+            "H": 25.001,
+            "X": 1004.306,
+            "Y": 5021.305
+          }
+        }
+      ]
+    }
+  ],
+  "auxiliares": [
+    {
+      "id": "A01",
+      "fonte": "NBR C.2",
+      "Z_mm": 3,
+      "k_ppm": 3,
+      "D_km": 0.75,
+      "esperado": {
+        "ed_mm": 3.75
+      }
+    },
+    {
+      "id": "A02",
+      "fonte": "NBR G.1",
+      "h": 145.036,
+      "sigma_h": 0.0184,
+      "zeta": -8.26,
+      "sigma_zeta": 0.17,
+      "esperado": {
+        "H": 153.296,
+        "sigma": 0.171
+      }
+    },
+    {
+      "id": "A03",
+      "fonte": "NBR G.2 (errata E4)",
+      "h": 145.036,
+      "sigma_h": 0.0184,
+      "H_RN": 87.211,
+      "sigma_H_RN": 0.0127,
+      "h_RN": 78.901,
+      "sigma_h_RN": 0.0061,
+      "zeta_RN": -8.21,
+      "zeta": -8.26,
+      "sigma_dzeta_mm_km": 10,
+      "D_m": 14723.098,
+      "esperado": {
+        "H": 153.396,
+        "sigma": 0.149
+      }
+    },
+    {
+      "id": "A04",
+      "R_m": 6371000,
+      "k": 0.13,
+      "esperado_m": {
+        "80": 0.000437,
+        "150": 0.001536,
+        "500": 0.01707
+      }
+    }
+  ],
+  "propagacao": [
+    {
+      "id": "P01",
+      "fonte": "Circuito AA Tab. 9, propagação doc 4 item 4.3.6",
+      "sigma_RN_m": 0.0,
+      "sigma_L_m_por_m": 2e-05,
+      "sigma_km_mm": 1.5,
+      "estacoes_dh": [
+        [
+          "A1",
+          55.689,
+          63.436
+        ],
+        [
+          "A2",
+          45.4,
+          48.492
+        ],
+        [
+          "A3",
+          63.45,
+          57.439
+        ],
+        [
+          "PS1",
+          43.678,
+          39.219
+        ],
+        [
+          "A4",
+          46.689,
+          53.923
+        ],
+        [
+          "A5",
+          51.436,
+          48.32
+        ],
+        [
+          "RN2",
+          48.647,
+          52.436
+        ]
+      ],
+      "esperado_mm": {
+        "sigma_fecho_leitura": 3.87,
+        "sigma_fecho_km": 1.27,
+        "rigorosa_leitura": {
+          "A1": 1.52,
+          "A2": 1.79,
+          "A3": 1.94,
+          "PS1": 1.9,
+          "A4": 1.72,
+          "A5": 1.33,
+          "RN2": 0.0
+        },
+        "anexoL_leitura": {
+          "A1": 1.69,
+          "A2": 2.15,
+          "A3": 2.73,
+          "PS1": 2.46,
+          "A4": 2.01,
+          "A5": 1.43,
+          "RN2": 0.0
+        },
+        "rigorosa_km": {
+          "A1": 0.47,
+          "A2": 0.58,
+          "A3": 0.63,
+          "PS1": 0.63,
+          "A4": 0.57,
+          "A5": 0.44,
+          "RN2": 0.0
+        },
+        "intermediario_14": 2.02
+      }
+    }
+  ]
+}

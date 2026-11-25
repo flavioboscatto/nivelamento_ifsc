@@ -1,0 +1,15 @@
+# Normas e apostilas: material licenciado, não versionar
+referencias/
+*.pdf
+
+# Arquivos de campo de alunos (usar apenas amostras anonimizadas em tests/dados/)
+dados_campo/
+
+# Sistema
+.DS_Store
+Thumbs.db
+node_modules/
+.vscode/
+
+# Arquivos antigos aguardando exclusão manual
+_to_delete/

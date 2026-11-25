@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Nivelamento IFSC — Calculadora de Nivelamento</title>
+  <meta name="description" content="Calculadora de nivelamento geométrico e trigonométrico do Curso Técnico em Agrimensura do IFSC, conforme a ABNT NBR 13133:2021. Cálculo feito no navegador.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/componentes.css">
+  <link rel="stylesheet" href="assets/css/impressao.css">
+  <script type="module" src="src/ui/layout.js"></script>
+</head>
+<body data-pagina="inicio">
+  <div id="cabecalho"></div>
+
+  <main id="conteudo">
+    <!-- 1. Apresentação: o que o site faz -->
+    <section class="apresentacao">
+      <div class="container">
+        <div>
+          <span class="rotulo">Calculadora de nivelamento · NBR 13133:2021</span>
+          <h1>Da caderneta de campo à cota, <span class="destaque">com rigor de norma.</span></h1>
+          <p class="lead">Calcule nivelamentos geométricos e trigonométricos a partir das leituras de campo, digitadas
+            na caderneta ou importadas do nível e da estação total. O site confere a verificação aritmética, o fechamento,
+            a tolerância e a classe da ABNT NBR 13133:2021, distribui o erro e informa a precisão de cada ponto.</p>
+          <ul class="lista-recursos">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
+              Digitação manual em todos os métodos, como na caderneta de papel
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
+              Tolerâncias, classes e propagação de precisões da NBR 13133:2021
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>
+              Memória de cálculo pronta para conferir em aula e imprimir
+            </li>
+          </ul>
+        </div>
+
+        <!-- Ilustração do princípio do nivelamento geométrico -->
+        <figure class="ilustracao" aria-labelledby="leg-ilustracao">
+          <svg viewBox="-10 20 600 285" role="img" aria-label="Nível entre duas miras: leitura de ré no ponto A, leitura de vante no ponto B; o desnível é a diferença entre as leituras.">
+            <defs>
+              <marker id="seta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0L10 5L0 10z" fill="var(--verde-escuro)"/>
+              </marker>
+            </defs>
+            <!-- terreno -->
+            <path d="M0 268 C 120 262, 220 250, 300 246 S 470 228, 560 222" fill="none" stroke="var(--texto)" stroke-width="2"/>
+            <path d="M0 268 C 120 262, 220 250, 300 246 S 470 228, 560 222 L560 300 L0 300 Z" fill="var(--fundo-alt)"/>
+            <!-- referência horizontal em A -->
+            <line x1="80" y1="263" x2="538" y2="263" stroke="var(--borda)" stroke-width="1.5" stroke-dasharray="4 5"/>
+            <!-- plano de visada (APV) -->
+            <line x1="80" y1="150" x2="480" y2="150" stroke="var(--verde)" stroke-width="2.5" stroke-dasharray="8 6"/>
+            <text x="300" y="132" text-anchor="middle" font-size="17" font-weight="700" fill="var(--verde-escuro)" font-family="var(--fonte)">plano de visada (APV)</text>
+            <!-- mira A -->
+            <g>
+              <rect x="72" y="83" width="16" height="180" fill="var(--fundo)" stroke="var(--texto-titulo)" stroke-width="2"/>
+              <g fill="var(--texto-titulo)">
+                <rect x="72" y="95" width="8" height="10"/><rect x="72" y="115" width="8" height="10"/><rect x="72" y="135" width="8" height="10"/>
+                <rect x="72" y="155" width="8" height="10"/><rect x="72" y="175" width="8" height="10"/><rect x="72" y="195" width="8" height="10"/>
+                <rect x="72" y="215" width="8" height="10"/><rect x="72" y="235" width="8" height="10"/>
+              </g>
+              <text x="80" y="289" text-anchor="middle" font-size="19" font-weight="700" fill="var(--texto-titulo)" font-family="var(--fonte)">A (RN)</text>
+            </g>
+            <!-- mira B -->
+            <g>
+              <rect x="472" y="50" width="16" height="180" fill="var(--fundo)" stroke="var(--texto-titulo)" stroke-width="2"/>
+              <g fill="var(--texto-titulo)">
+                <rect x="472" y="62" width="8" height="10"/><rect x="472" y="82" width="8" height="10"/><rect x="472" y="102" width="8" height="10"/>
+                <rect x="472" y="122" width="8" height="10"/><rect x="472" y="142" width="8" height="10"/><rect x="472" y="162" width="8" height="10"/>
+                <rect x="472" y="182" width="8" height="10"/><rect x="472" y="202" width="8" height="10"/>
+              </g>
+              <text x="480" y="252" text-anchor="middle" font-size="19" font-weight="700" fill="var(--texto-titulo)" font-family="var(--fonte)">B</text>
+            </g>
+            <!-- nível sobre tripé -->
+            <g stroke="var(--texto-titulo)" stroke-width="2.5" stroke-linecap="round" fill="none">
+              <path d="M280 166 L252 246 M280 166 L308 244 M280 166 L281 247"/>
+              <path d="M266 160 h28 l-4 6 h-20 z" fill="var(--fundo)"/>
+            </g>
+            <rect x="256" y="140" width="48" height="20" rx="3" fill="var(--verde-escuro)"/>
+            <rect x="304" y="144" width="10" height="12" rx="2" fill="var(--verde-escuro)"/>
+            <!-- cotas: leitura de ré -->
+            <line x1="46" y1="153" x2="46" y2="260" stroke="var(--verde-escuro)" stroke-width="2" marker-start="url(#seta)" marker-end="url(#seta)"/>
+            <text x="38" y="214" text-anchor="end" font-size="19" font-weight="700" fill="var(--verde-escuro)" font-family="var(--fonte)">L<tspan font-size="14" dy="5">ré</tspan></text>
+            <!-- cotas: leitura de vante -->
+            <line x1="504" y1="153" x2="504" y2="227" stroke="var(--verde-escuro)" stroke-width="2" marker-start="url(#seta)" marker-end="url(#seta)"/>
+            <text x="512" y="195" font-size="19" font-weight="700" fill="var(--verde-escuro)" font-family="var(--fonte)">L<tspan font-size="14" dy="5">vante</tspan></text>
+            <!-- desnível -->
+            <line x1="540" y1="226" x2="540" y2="260" stroke="var(--texto-titulo)" stroke-width="2" marker-start="url(#seta)" marker-end="url(#seta)"/>
+            <text x="548" y="248" font-size="19" font-weight="700" fill="var(--texto-titulo)" font-family="var(--fonte)">Δh</text>
+          </svg>
+          <figcaption id="leg-ilustracao">
+            Princípio do nivelamento geométrico<br>
+            <span class="formula">Δh = L<sub>ré</sub> − L<sub>vante</sub></span>
+            <span class="formula">H<sub>B</sub> = H<sub>A</sub> + Δh</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 2. As duas opções -->
+    <section class="metodos" aria-labelledby="titulo-metodos">
+      <div class="container">
+        <div class="cab-secao">
+          <span class="rotulo">Escolha o método</span>
+          <h2 id="titulo-metodos">Dois métodos, <span class="destaque">uma caderneta.</span></h2>
+          <p>Em ambos você pode digitar as leituras manualmente ou importar o arquivo do equipamento. A caderneta importada continua editável.</p>
+        </div>
+
+        <div class="grade-metodos">
+          <!-- Geométrico -->
+          <article class="cartao-metodo">
+            <svg class="icone" viewBox="0 0 64 64" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="13" y="14" width="34" height="11" rx="2"/>
+              <rect x="47" y="16.5" width="6" height="6" rx="1"/>
+              <circle cx="24" cy="19.5" r="2"/>
+              <path d="M24 25h16l-3 6H27z"/>
+              <path d="M32 31L18 58M32 31L46 58M32 31v27"/>
+              <path d="M4 10h56" stroke-dasharray="3 4"/>
+            </svg>
+            <h3>Nivelamento Geométrico</h3>
+            <p>Leituras de ré e vante em miras verticais com nível óptico ou digital. Precisão milimétrica, tolerâncias da Tabela 5 (classe I N).</p>
+            <ul class="modos">
+              <li><strong>Irradiação de pontos de detalhe</strong><span>APV e cotas</span></li>
+              <li><strong>Transporte de RN</strong><span>nivelamento e contranivelamento</span></li>
+              <li><strong>Circuito fechado</strong><span>fechamento e distribuição do erro</span></li>
+              <li><strong>Linha entre duas RN</strong><span>partida e chegada conhecidas</span></li>
+            </ul>
+            <div class="acoes">
+              <a class="botao botao-primario" href="geometrico.html">Digitar caderneta</a>
+              <a class="botao botao-secundario" aria-disabled="true" title="Disponível quando recebermos os arquivos do Leica Sprinter">Importar arquivo <span class="etiqueta">em breve</span></a>
+            </div>
+          </article>
+
+          <!-- Trigonométrico -->
+          <article class="cartao-metodo">
+            <svg class="icone" viewBox="0 0 64 64" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="22" y="6" width="20" height="24" rx="2"/>
+              <circle cx="32" cy="15" r="4.5"/>
+              <rect x="26" y="23" width="12" height="4"/>
+              <path d="M20 30h24l-3 4H23z"/>
+              <path d="M32 34L18 58M32 34L46 58M32 34v24"/>
+              <path d="M36.5 13L60 4" stroke-dasharray="3 4"/>
+              <path d="M44 15a12 12 0 0 0-1.5-6"/>
+            </svg>
+            <h3>Nivelamento Trigonométrico</h3>
+            <p>Ângulo zenital, distância, altura do instrumento e do sinal, com estação total ou teodolito. Tolerâncias da Tabela 6 (classes II N e III N).</p>
+            <ul class="modos">
+              <li><strong>Irradiação</strong><span>Z, distância inclinada ou horizontal</span></li>
+              <li><strong>Poligonal altimétrica</strong><span>ré e vante, fechamento</span></li>
+              <li><strong>Visadas recíprocas</strong><span>curvatura e refração acima de 125 m</span></li>
+              <li><strong>Taqueometria e estadimetria</strong><span>fios superior, médio e inferior</span></li>
+            </ul>
+            <div class="acoes">
+              <a class="botao botao-primario" href="trigonometrico.html">Digitar caderneta</a>
+              <a class="botao botao-secundario" aria-disabled="true" title="Disponível quando recebermos os arquivos da FOIF e da Ruide RQS">Importar arquivo <span class="etiqueta">em breve</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Como funciona -->
+    <section class="como-funciona" aria-labelledby="titulo-como">
+      <div class="container">
+        <span class="rotulo">Como funciona</span>
+        <h2 id="titulo-como" style="font-size:clamp(30px,3.2vw,40px);font-weight:800">Três passos, <span class="destaque">do campo ao relatório.</span></h2>
+        <ol class="passos">
+          <li>
+            <h3>Digite ou importe</h3>
+            <p>Preencha a caderneta como no papel — vírgula decimal, ângulos em graus, minutos e segundos — ou cole as linhas de uma planilha.</p>
+          </li>
+          <li>
+            <h3>Confira com a norma</h3>
+            <p>Escolha a classe do levantamento. O site mostra erro de fechamento, tolerância, “Atende” ou “Não atende” e alerta visadas fora do recomendado.</p>
+          </li>
+          <li>
+            <h3>Exporte o resultado</h3>
+            <p>Cotas ou altitudes corrigidas com desvio-padrão, perfil do terreno, planilha CSV e relatório com memória de cálculo para impressão.</p>
+          </li>
+        </ol>
+        <p class="privacidade">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span>Todo o cálculo acontece no seu navegador. As leituras de campo não são enviadas a nenhum servidor.</span>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <div id="rodape"></div>
+</body>
+</html>
