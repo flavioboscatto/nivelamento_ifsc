@@ -32,6 +32,17 @@
           <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
           <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
         </div>
+        <details class="dados-relatorio" id="dados-relatorio">
+          <summary>Dados para o relatório (objeto, finalidade, local, data, equipe)</summary>
+          <div class="grade-campos">
+            <label class="largo">Objeto / serviço <input id="rel-objeto" autocomplete="off" placeholder="ex.: transporte de RN para o pátio"></label>
+            <label class="largo">Finalidade <input id="rel-finalidade" autocomplete="off" placeholder="ex.: aula prática de nivelamento"></label>
+            <label class="largo">Local <input id="rel-local" autocomplete="off" placeholder="ex.: IFSC Câmpus Florianópolis"></label>
+            <label>Data do levantamento <input id="rel-data" type="date"></label>
+            <label>Operador <input id="rel-operador" autocomplete="off"></label>
+            <label class="largo">Equipe <input id="rel-equipe" autocomplete="off" placeholder="nomes separados por vírgula"></label>
+          </div>
+        </details>
       </section>
 
       <section class="bloco" aria-labelledby="t-dados">
@@ -54,7 +65,11 @@
         <div class="barra-acoes nao-imprimir">
           <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo AA Ex. I</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
-          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+          <button type="button" class="botao botao-secundario" id="bt-csv-resultados">CSV dos resultados</button>
+          <button type="button" class="botao botao-secundario" id="bt-previa">Prévia do relatório</button>
+          <button type="button" class="botao botao-secundario" id="bt-xlsx">Planilha (.xlsx)</button>
+          <button type="button" class="botao botao-secundario" id="bt-docx">Relatório Word (.docx)</button>
+          <button type="button" class="botao botao-primario" id="bt-relatorio">Relatório / PDF</button>
         </div>
       </section>
 
@@ -71,6 +86,24 @@
         <h3 class="subtitulo">Gráfico</h3>
         <div id="grafico" class="caixa-perfil"></div>
         <p class="nota">Fórmulas: média x̄ = Σx/n; resíduo v = x̄ − x; s = √(Σv²/(n − 1)); desvio-padrão da média s<sub>x̄</sub> = s/√n. Atípica: |x − x̄| maior que 3 s (ou o limite fixo), com x̄ e s calculados sem a observação testada, uma de cada vez.</p>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-cr">
+        <h2 id="t-cr"><span class="numero">3</span> Curvatura e refração</h2>
+        <p class="nota">Efeito da curvatura da Terra e da refração atmosférica numa visada de distância horizontal DH: c = DH²/2R, r = −k·DH²/2R e c + r = (1 − k)·DH²/2R. A NBR 13133:2021 (5.5.3.1) pede considerar c + r e usar visadas recíprocas acima de <span id="cr-limiar">125</span> m.</p>
+        <form id="form-cr" class="grade-campos">
+          <label>Raio da Terra R (m) <input id="cr-raio" inputmode="decimal" autocomplete="off"></label>
+          <label>Coeficiente de refração k <input id="cr-k" inputmode="decimal" autocomplete="off"></label>
+          <label class="largo">Distâncias (m), separadas por ";" ou espaço <input id="cr-distancias" autocomplete="off" value="30; 50; 80; 100; 125; 150; 200; 300; 500; 1000"></label>
+        </form>
+        <div class="rolagem-tabela" id="tabela-cr"></div>
+        <h3 class="subtitulo">No nivelamento geométrico com visadas desiguais</h3>
+        <p class="nota">Com ré e vante à mesma distância, c + r se anula. Com distâncias diferentes, sobra c + r(DH ré) − c + r(DH vante) na altura do ponto.</p>
+        <form id="form-residual" class="grade-campos">
+          <label>DH da ré (m) <input id="res-re" inputmode="decimal" autocomplete="off" value="60"></label>
+          <label>DH da vante (m) <input id="res-vante" inputmode="decimal" autocomplete="off" value="40"></label>
+          <p class="resultado-residual largo" id="resultado-residual"></p>
+        </form>
       </section>
     </div>
   </main>

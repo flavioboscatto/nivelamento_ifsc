@@ -81,3 +81,21 @@ test('irradiação a partir de ponto calculado (nova estação)', () => {
   perto(p2.X, 1020, 1e-9, 'X P2');
   perto(p2.Y, 5030, 1e-9, 'Y P2');
 });
+
+test('ângulos em GG,MMSS (D33): formato dos equipamentos', async () => {
+  const { lerAnguloSexagesimal } = await import('../src/core/angulos.js');
+  const g = (t) => lerAnguloSexagesimal(t) * 180 / Math.PI;
+  perto(g('91,1940'), 91 + 19 / 60 + 40 / 3600, 1e-9, '91,1940');
+  perto(g('91.1940'), 91 + 19 / 60 + 40 / 3600, 1e-9, 'ponto decimal');
+  perto(g('91,19405'), 91 + 19 / 60 + 40.5 / 3600, 1e-9, 'décimo de segundo');
+  perto(g('90'), 90, 1e-12, 'graus inteiros');
+  perto(g("91°19'40\""), 91 + 19 / 60 + 40 / 3600, 1e-9, 'com símbolos');
+  assert.ok(Number.isNaN(lerAnguloSexagesimal('91,6000')), 'minutos ≥ 60');
+  assert.ok(Number.isNaN(lerAnguloSexagesimal('101,4753g')), 'grados não');
+  // Q01 digitado em GG,MMSS dá o mesmo resultado
+  const q = caso('Q01');
+  const p = q.pontos[0];
+  const r = calcularTaqueometria([{ estacao: '100', i: q.estacao.i }, { ponto: p.p, fs: p.FS, fm: p.FM, fi: p.FI, z: '95,3731', hz: '237,4755' }],
+    { H_ref: q.estacao.H, X_ref: q.estacao.X, Y_ref: q.estacao.Y, pontoRef: '100' });
+  perto(r.pontos[0].X, p.esperado.X, TOL, 'X do ponto 12');
+});

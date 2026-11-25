@@ -37,6 +37,17 @@
           <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
           <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
         </div>
+        <details class="dados-relatorio" id="dados-relatorio">
+          <summary>Dados para o relatório (objeto, finalidade, local, data, equipe)</summary>
+          <div class="grade-campos">
+            <label class="largo">Objeto / serviço <input id="rel-objeto" autocomplete="off" placeholder="ex.: transporte de RN para o pátio"></label>
+            <label class="largo">Finalidade <input id="rel-finalidade" autocomplete="off" placeholder="ex.: aula prática de nivelamento"></label>
+            <label class="largo">Local <input id="rel-local" autocomplete="off" placeholder="ex.: IFSC Câmpus Florianópolis"></label>
+            <label>Data do levantamento <input id="rel-data" type="date"></label>
+            <label>Operador <input id="rel-operador" autocomplete="off"></label>
+            <label class="largo">Equipe <input id="rel-equipe" autocomplete="off" placeholder="nomes separados por vírgula"></label>
+          </div>
+        </details>
       </section>
 
       <div class="abas-modo" role="tablist" aria-label="Modo de cálculo">
@@ -86,7 +97,12 @@
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
           <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
-          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+          <button type="button" class="botao botao-secundario" id="bt-csv-caderneta">CSV da caderneta</button>
+          <button type="button" class="botao botao-secundario" id="bt-csv-resultados">CSV dos resultados</button>
+          <button type="button" class="botao botao-secundario" id="bt-previa">Prévia do relatório</button>
+          <button type="button" class="botao botao-secundario" id="bt-xlsx">Planilha (.xlsx)</button>
+          <button type="button" class="botao botao-secundario" id="bt-docx">Relatório Word (.docx)</button>
+          <button type="button" class="botao botao-primario" id="bt-relatorio">Relatório / PDF</button>
         </div>
         <div class="rolagem-tabela" id="caderneta"></div>
         <p class="nota">Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>

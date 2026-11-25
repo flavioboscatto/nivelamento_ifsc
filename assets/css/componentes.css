@@ -255,3 +255,11 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 .grafico-serie .legenda { font-size: 13px; fill: var(--texto); }
 @media (max-width: 760px) { .barra-projeto-simples { grid-template-columns: minmax(0, 1fr); } }
 .link-apoio { margin-top: 22px; font-size: 16px; }
+
+/* ---------- Dados do relatório (etapa 11) ---------- */
+.dados-relatorio { grid-column: 1 / -1; border-top: 1px solid var(--borda); padding-top: 10px; }
+.dados-relatorio summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--texto-titulo); }
+.dados-relatorio .grade-campos { margin-top: 12px; }
+.resultado-residual { margin: 6px 0 0; color: var(--texto-titulo); font-size: 17px; }
+.acoes-figura { margin-top: 8px; }
+.acoes-figura .botao { padding: 8px 12px; font-size: 13px; }

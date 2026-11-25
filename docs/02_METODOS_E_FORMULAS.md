@@ -203,7 +203,7 @@ $\sigma_H = \sqrt{\sigma_h^2 + \sigma_{H_{RN}}^2 + \sigma_{h_{RN}}^2 + (\sigma_{
 - Sexagesimal ↔ decimal: $g = G + M/60 + S/3600$.
 - Grado (gon): $g = gon\cdot 0{,}9$.
 - Radianos para cálculo; segundos → rad: $\times \pi/648000$.
-- Entradas aceitas: `91°19'40"`, `91 19 40`, `91.1940` (formato DD.MMSS, só com opção explícita), `91,32778` (decimal), `101,4815g` (gon).
+- **Entrada nas cadernetas (D33): sempre sexagesimal, no formato GG,MMSS** dos equipamentos (`91,1940` = 91°19'40"; `91,19405` = 91°19'40,5"); também `91°19'40"` e `91 19 40`. Graus decimais e grados não são aceitos na interface (o núcleo `parseAngulo` ainda os converte, só para uso interno e testes).
 
 ## 2.8 Representação numérica
 

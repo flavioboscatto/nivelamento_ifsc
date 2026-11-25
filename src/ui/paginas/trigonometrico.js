@@ -2,10 +2,11 @@
 // Modos: irradiação, poligonal altimétrica (II N) e visadas recíprocas. Taqueometria: etapa 6.
 import { calcularTrigonometrico, visadasReciprocas, curvaturaRefracao } from '../../core/trigonometrico.js';
 import { calcularTaqueometria } from '../../core/taqueometria.js';
-import { parseAngulo, formatarDms } from '../../core/angulos.js';
+import { lerAnguloSexagesimal as parseAngulo, formatarDms, AJUDA_ANGULO } from '../../core/angulos.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
+import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
 
 const CHAVE_RASCUNHO = 'nivelamento-ifsc.trigonometrico.v1';
 const CHAVE_TIPO_ALTURA = 'nivelamento-ifsc.tipoAltura';
@@ -249,7 +250,7 @@ function mostrarReciprocas(linhas, op) {
     const nome = `Linha ${i + 1}${b.de || b.para ? ` (${b.de || '?'} → ${b.para || '?'})` : ''}`;
     const ler = (campo, rotulo, ang = false) => {
       const v = ang ? parseAngulo(b[campo]) : num(b[campo]);
-      if (!Number.isFinite(v)) msgs.push(String(b[campo] ?? '').trim() === '' ? `falta ${rotulo}.` : `${rotulo} "${b[campo]}" não é válido.`);
+      if (!Number.isFinite(v)) msgs.push(String(b[campo] ?? '').trim() === '' ? `falta ${rotulo}.` : `${rotulo} "${b[campo]}" não é válido${ang ? ` (${AJUDA_ANGULO})` : ''}.`);
       return v;
     };
     const ida = { Z: ler('zAB', 'o ângulo zenital A→B', true), Di: ler('diAB', 'a distância A→B'), i: ler('iA', 'a altura do instrumento em A'), s: ler('sB', 'a altura do sinal em B') };
@@ -378,6 +379,78 @@ function mostrarParametros(op) {
   </dl>`;
 }
 
+// ---------- Relatório (etapa 11) ----------
+const NOMES_MODO = { irradiacao: 'irradiação', poligonal: 'poligonal altimétrica', reciprocas: 'visadas recíprocas', taqueometria: 'taqueometria' };
+
+function memoriaTrigonometrico() {
+  const rot = rotAltura();
+  if (modo === 'taqueometria') {
+    return [
+      'Ângulos digitados em GG,MMSS (sexagesimal).',
+      'Número gerador S = FS − FI; DH = C · S · sen²Z (C = 100); DV = ½ · C · S · sen 2Z.',
+      `DN = DH · cot Z + i − FM; ${rot}(P) = ${rot}(estação) + DN.`,
+      'Az = Az<sub>ref</sub> + Hz; X = X<sub>E</sub> + DH · sen Az; Y = Y<sub>E</sub> + DH · cos Az.',
+      'σ: σ<sub>S</sub> = √2 · σ<sub>leit</sub>; σ²<sub>DN</sub> = (½ C sen 2Z)² σ²<sub>S</sub> + (C S cos 2Z)² σ²<sub>Z</sub> + σ²<sub>i</sub> + σ²<sub>FM</sub>.',
+    ];
+  }
+  if (modo === 'reciprocas') {
+    return [
+      'Ângulos digitados em GG,MMSS (sexagesimal).',
+      'Δh<sub>A→B</sub> = D<sub>i</sub> · cos Z + i<sub>A</sub> − s<sub>B</sub> (sem curvatura e refração); idem B→A.',
+      'Δh médio = (Δh<sub>A→B</sub> − Δh<sub>B→A</sub>) / 2 — a curvatura e a refração se cancelam (NBR 5.5.3.1).',
+      'Controle: Δh<sub>A→B</sub> + Δh<sub>B→A</sub> ≈ −2 · (1 − k) · DH² / 2R.',
+      'σ² = ¼ (σ²<sub>ida</sub> + σ²<sub>volta</sub>).',
+    ];
+  }
+  const m = [
+    'Ângulos digitados em GG,MMSS (sexagesimal); com PD e PI: Z = (Z<sub>PD</sub> − Z<sub>PI</sub> + 360°)/2 (NBR 5.2.10).',
+    'Com D<sub>i</sub>: DH = D<sub>i</sub> · sen Z, DV = D<sub>i</sub> · cos Z; com DH: DV = DH · cot Z.',
+    'Curvatura e refração: c+r = (1 − k) · DH² / 2R, aplicada conforme a opção escolhida (NBR 5.5.3.1).',
+    `Eixo do instrumento: A = ${rot}(estação) + i, ou A = ${rot}(ré) − (DV + c+r − s)<sub>ré</sub> (estação livre); ${rot}(P) = A + DV + c+r − s.`,
+    'σ por visada (forma geral): cos²Z · σ²<sub>Di</sub> + (D<sub>i</sub> sen Z)² · σ²<sub>Z</sub> + σ²<sub>s</sub> (+ σ²<sub>i</sub>); igual à NBR F.3 com estação sobre ponto. σ<sub>Di</sub> pelo Anexo C.',
+  ];
+  if (modo === 'poligonal') {
+    m.push(
+      `Erro de fechamento: e = ${rot} calculada no fecho − ${rot} conhecida; K = soma das DH (km).`,
+      'Tolerância: T = 120 √K (ET classe 1, duas séries) ou 200 √K (ET classe 2, uma série), NBR 13133:2021, Tabela 6.',
+      'Distribuição proporcional à distância: v<sub>P</sub> = −e · d<sub>acum</sub>(P) / d<sub>total</sub>.',
+      'σ rigoroso combinando os dois sentidos (doc 4, 4.3.6); Anexo L ao lado.',
+    );
+  }
+  return m;
+}
+
+function contextoRelatorio() {
+  const cab = lerCabecalho();
+  const rot = rotAltura();
+  const ident = [
+    ['Método', `Nivelamento trigonométrico — ${NOMES_MODO[modo]}`],
+    ['Trabalhando com', tipoAltura() === 'altitude_normal' ? 'Altitude normal (referida ao SGB)' : 'Cota (referência arbitrária)'],
+    ['Referência', `${cab.pontoRef || '—'}: ${cab.H_ref || '—'} m ± ${cab.sigmaRef_mm || '0'} mm`],
+  ];
+  if (modo === 'taqueometria' && (cab.X_ref || cab.Y_ref)) ident.push(['Coordenadas da estação', `X = ${cab.X_ref} m; Y = ${cab.Y_ref} m; Az (Hz = 0) = ${cab.azRef || '0'}`]);
+  if (modo === 'poligonal') {
+    const c = norma.trigonometrico.find((x) => x.id === cab.classe);
+    if (c) ident.push(['Classe', `${c.rotulo} — ${c.tol_mm_raizK}√K`]);
+    if (cab.pontoChegada) ident.push(['Ponto de chegada', `${cab.pontoChegada}: ${cab.H_chegada || '—'} m ± ${cab.sigmaChegada_mm || '0'} mm`]);
+  }
+  const ins = instrumentos.find((n) => n.id === cab.instrumento);
+  ident.push(['Instrumento', `${ins?.rotulo ?? '—'} — σZ ${cab.sigmaZ_s || '—'}"${modo === 'taqueometria' ? `; σ leitura ${cab.sigmaLeit_mm || '—'} mm` : `; σD ${cab.distA_mm || '—'} mm + ${cab.distB_ppm || '—'} ppm`}`]);
+  return {
+    titulo: `Nivelamento trigonométrico — ${NOMES_MODO[modo]}`,
+    projeto: $('nome-projeto').value.trim(), modo, identificacao: ident, parametros: 'parametros',
+    secoes: [
+      { titulo: 'Caderneta de campo', conteudo: tabelaEnxuta($('caderneta').querySelector('table'), { tirarColunas: ['Situação'] }) },
+      { titulo: modo === 'poligonal' ? 'Fechamento e tolerância' : 'Distâncias', conteudo: cartoes('fechamento', 'tolerancias', 'distancias') },
+      { titulo: `${rot}s calculadas`, conteudo: bloco('tabela-pontos') },
+      { titulo: 'Avisos do cálculo', conteudo: $('mensagens').querySelector('li') ? bloco('mensagens') : null },
+    ],
+    memoria: memoriaTrigonometrico(),
+    tabelaResultados: $('tabela-pontos').querySelector('table'),
+    tabelaCaderneta: $('caderneta').querySelector('table'),
+  };
+}
+
 // ---------- Rascunho, modos e projeto ----------
 function salvarRascunho(cab, linhas) {
   rascunho.modo = modo; rascunho.nome = $('nome-projeto').value;
@@ -416,7 +489,7 @@ function trocarModo(novo) {
   carregarModo(novo);
 }
 function salvarProjeto() {
-  const p = criarProjeto({ nome: $('nome-projeto').value.trim(), tipoAltura: tipoAltura(), modulo: 'trigonometrico', modo, cabecalho: lerCabecalho(), linhas: caderneta.obterLinhas() });
+  const p = criarProjeto({ nome: $('nome-projeto').value.trim(), tipoAltura: tipoAltura(), modulo: 'trigonometrico', modo, cabecalho: lerCabecalho(), linhas: caderneta.obterLinhas(), relatorio: obterDadosRelatorio() });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([serializarProjeto(p)], { type: 'application/json' }));
   a.download = nomeArquivo(p.nome, modo);
@@ -432,6 +505,7 @@ async function abrirProjeto(ev) {
   salvarRascunho(lerCabecalho(), caderneta.obterLinhas());
   $('nome-projeto').value = r.projeto.nome || '';
   definirTipoAltura(r.projeto.tipoAltura);
+  definirDadosRelatorio(r.projeto.relatorio);
   carregarModo(MODOS[r.projeto.modo] ? r.projeto.modo : 'irradiacao', { cabecalho: r.projeto.cabecalho, linhas: r.projeto.linhas });
 }
 
@@ -477,7 +551,7 @@ async function iniciar() {
   $('arquivo-projeto').addEventListener('change', abrirProjeto);
   $('bt-adicionar').addEventListener('click', () => caderneta.adicionarLinha());
   $('bt-limpar').addEventListener('click', () => { if (confirm('Apagar todas as linhas da caderneta? O cabeçalho é mantido.')) caderneta.definirLinhas([]); });
-  $('bt-imprimir').addEventListener('click', () => window.print());
+  iniciarRelatorio({ pagina: 'trigonometrico', contexto: contextoRelatorio });
   $('bt-exemplo').addEventListener('click', async () => {
     const ex = await lerJson('../../../data/exemplos/aa_ex5_taqueometria.json');
     definirCabecalho(ex.cabecalho);

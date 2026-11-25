@@ -37,6 +37,17 @@
           <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
           <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
         </div>
+        <details class="dados-relatorio" id="dados-relatorio">
+          <summary>Dados para o relatório (objeto, finalidade, local, data, equipe)</summary>
+          <div class="grade-campos">
+            <label class="largo">Objeto / serviço <input id="rel-objeto" autocomplete="off" placeholder="ex.: transporte de RN para o pátio"></label>
+            <label class="largo">Finalidade <input id="rel-finalidade" autocomplete="off" placeholder="ex.: aula prática de nivelamento"></label>
+            <label class="largo">Local <input id="rel-local" autocomplete="off" placeholder="ex.: IFSC Câmpus Florianópolis"></label>
+            <label>Data do levantamento <input id="rel-data" type="date"></label>
+            <label>Operador <input id="rel-operador" autocomplete="off"></label>
+            <label class="largo">Equipe <input id="rel-equipe" autocomplete="off" placeholder="nomes separados por vírgula"></label>
+          </div>
+        </details>
       </section>
 
       <div class="abas-modo" role="tablist" aria-label="Modo de cálculo">
@@ -55,7 +66,7 @@
           <label>σ da referência (mm) <input id="ref-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
           <label data-modos="taqueometria">X da estação (m) <input id="ref-x" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
           <label data-modos="taqueometria">Y da estação (m) <input id="ref-y" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
-          <label data-modos="taqueometria">Azimute da direção Hz = 0 <input id="az-ref" autocomplete="off" placeholder="0°00'00&quot;"></label>
+          <label data-modos="taqueometria">Azimute da direção Hz = 0 <input id="az-ref" autocomplete="off" placeholder="GG,MMSS"></label>
           <label data-modos="taqueometria">σ da leitura na mira (mm) <input id="sigma-leit" inputmode="decimal" autocomplete="off"></label>
           <label data-modos="poligonal">Ponto de chegada <input id="cheg-ponto" autocomplete="off" placeholder="vazio = fecha na referência"></label>
           <label data-modos="poligonal"><span><span data-altura>Cota</span> do ponto de chegada (m)</span> <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
@@ -86,10 +97,15 @@
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
           <button type="button" class="botao botao-secundario" id="bt-exemplo" data-modos="taqueometria">Exemplo AA Ex. V</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
-          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+          <button type="button" class="botao botao-secundario" id="bt-csv-caderneta">CSV da caderneta</button>
+          <button type="button" class="botao botao-secundario" id="bt-csv-resultados">CSV dos resultados</button>
+          <button type="button" class="botao botao-secundario" id="bt-previa">Prévia do relatório</button>
+          <button type="button" class="botao botao-secundario" id="bt-xlsx">Planilha (.xlsx)</button>
+          <button type="button" class="botao botao-secundario" id="bt-docx">Relatório Word (.docx)</button>
+          <button type="button" class="botao botao-primario" id="bt-relatorio">Relatório / PDF</button>
         </div>
         <div class="rolagem-tabela" id="caderneta"></div>
-        <p class="nota">Ângulos em 91°19'40", 91 19 40 ou graus decimais. Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
+        <p class="nota">Ângulos sempre sexagesimais, no formato <strong>GG,MMSS</strong> (como no equipamento): 91,1940 = 91°19'40"; 91,19405 = 91°19'40,5". Também aceita 91°19'40" ou 91 19 40. Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
       </section>
 
       <section class="bloco" aria-labelledby="t-res" aria-live="polite">

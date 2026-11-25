@@ -7,6 +7,8 @@ import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js'
 import { criarCaderneta } from '../caderneta.js';
 import { perfilSvg } from '../perfil_svg.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
+import { botaoPng } from '../figuras.js';
+import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
 
 const CHAVE_RASCUNHO = 'nivelamento-ifsc.geometrico.v2';
 const CHAVE_ANTIGA = 'nivelamento-ifsc.geometrico.v1';
@@ -232,7 +234,7 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
       <div><dt>Σ ré</dt><dd>${f3(v.somaRe)} m</dd></div>
       <div><dt>Σ vante (mudanças e final)</dt><dd>${f3(v.somaVante)} m</dd></div>
       <div><dt>Σ ré − Σ vante</dt><dd>${formatarComSinal(v.diferencaLeituras, 3)} m</dd></div>
-      <div><dt>H final − H inicial</dt><dd>${formatarComSinal(v.diferencaH, 3)} m</dd></div>
+      <div><dt>${rotAltura} final − ${rotAltura} inicial</dt><dd>${formatarComSinal(v.diferencaH, 3)} m</dd></div>
     </dl>
     <p class="status ${v.confere ? 'ok' : 'falha'}">${v.confere ? '✓ Confere' : `✗ Não confere — diferença de ${formatar(v.discrepancia * 1000, 1)} mm (limite ${formatar(TOL_VERIFICACAO_M * 1000, 1)} mm)`}</p>`
     : `<p class="status neutro">Não se aplica: ${esc(v.motivo)}</p>`;
@@ -342,7 +344,7 @@ function mostrarFechamento(f) {
       <div><dt>Δh médio = (Δh ida − Δh volta) / 2</dt><dd>${formatarComSinal(t.dhMedio, 4)} m</dd></div>
       <div><dt>${esc(t.ponto)} pela média (AA Eq. 17–19)</dt><dd><strong>${f3(t.H)} m</strong>${Number.isFinite(t.sigma) ? ` ± ${fmm(t.sigma)} mm` : ''}</dd></div>
     </dl>
-    <p class="nota">σ da média pela forma 4.3.6 c: σ² = σ²(partida) + ¼ (V ida + V volta). Na tabela de alturas, ${esc(t.ponto)} aparece com a distribuição escolhida; a diferença entre os dois valores é menor que 1 mm quando ida e volta têm extensões parecidas.</p>` : '';
+    <p class="nota">σ da média pela forma 4.3.6 c: σ² = σ²(partida) + ¼ (V ida + V volta). Na tabela de ${rotAltura().toLowerCase()}s, ${esc(t.ponto)} aparece com a distribuição escolhida; a diferença entre os dois valores é menor que 1 mm quando ida e volta têm extensões parecidas.</p>` : '';
 }
 
 // ---------- Rascunho e modos ----------
@@ -395,11 +397,71 @@ function trocarModo(novo) {
   caderneta.definirLinhas(salvo?.linhas ?? []);
 }
 
+// ---------- Relatório (etapa 11) ----------
+function memoriaGeometrico(cab) {
+  const rot = rotAltura();
+  const m = [
+    `APV = ${rot}(ré) + L<sub>ré</sub>; ${rot}(vante) = APV − L<sub>vante</sub> (NBR 13133:2021, F.2).`,
+    'DH não digitada: estadimetria DH = 100 · (FS − FI); conferência dos três fios |FM − (FS + FI)/2| (NBR 5.5.2.5).',
+    `Verificação aritmética: Σ ré − Σ vante (mudanças e final) = ${rot} final − ${rot} inicial.`,
+  ];
+  if (modo === 'irradiacao') {
+    m.push('σ das vantes: σ² = σ²<sub>ré</sub> + 2 (σ<sub>L</sub> · DH<sub>m</sub>)², DH<sub>m</sub> = (DH<sub>ré</sub> + DH<sub>vante</sub>)/2 (NBR F.1); irradiados: σ² = σ²<sub>ré</sub> + (σ<sub>L</sub>·DH<sub>ré</sub>)² + (σ<sub>L</sub>·DH<sub>P</sub>)².');
+    return m;
+  }
+  m.push(
+    `Erro de fechamento: e = ${rot} calculada no fecho − ${rot} conhecida.`,
+    modo === 'transporte' ? 'K = extensão do nivelamento (ida), em km; a extensão do contranivelamento é mostrada ao lado.' : 'K = soma das DH de ré e de vante de mudança, em km (irradiados não entram).',
+    'Tolerância: T = t · √K, com t = 6, 8 ou 12 mm conforme a classe do nível (NBR 13133:2021, Tabela 5); atende se |e| ≤ T.',
+    cab.distribuicao === 'estacao'
+      ? `Distribuição por estação (apostila, não prevista na NBR 2021): C = e / n; correção do ponto visado da estação N = −N · C${cab.arredondarC ? ' (C arredondado a 0,1 mm)' : ''}.`
+      : 'Distribuição proporcional à distância (NBR 5.5.2.12): v<sub>P</sub> = −e · d<sub>acum</sub>(P) / d<sub>total</sub>.',
+    'Variância por estação: V<sub>j</sub> = (σ<sub>L</sub>·DH<sub>ré</sub>)² + (σ<sub>L</sub>·DH<sub>vante</sub>)² (NBR F.1).',
+    modo === 'linha'
+      ? 'σ rigoroso: V<sub>1</sub> = σ²<sub>A</sub> + V<sub>a</sub>, V<sub>2</sub> = σ²<sub>B</sub> + (V<sub>T</sub> − V<sub>a</sub>), σ² = V<sub>1</sub>V<sub>2</sub>/(V<sub>1</sub> + V<sub>2</sub>); Anexo L: menor σ entre os dois sentidos.'
+      : 'σ rigoroso: σ² = σ²<sub>RN</sub> + V<sub>a</sub>(V<sub>T</sub> − V<sub>a</sub>)/V<sub>T</sub>; Anexo L: σ² = σ²<sub>RN</sub> + mín(V<sub>a</sub>, V<sub>T</sub> − V<sub>a</sub>).',
+  );
+  if (modo === 'transporte') m.push('RN de chegada pela média: Δh = (Δh<sub>ida</sub> − Δh<sub>volta</sub>)/2; σ² = σ²<sub>partida</sub> + ¼ (V<sub>ida</sub> + V<sub>volta</sub>).');
+  return m;
+}
+
+function contextoRelatorio() {
+  const cab = lerCabecalho();
+  const rot = rotAltura();
+  const ins = instrumentos.niveis.find((n) => n.id === cab.instrumento);
+  const classe = norma.geometrico.find((c) => c.id === cab.classe);
+  const ident = [
+    ['Método', `Nivelamento geométrico — ${nomeMetodo(modo)}`],
+    ['Trabalhando com', tipoAltura() === 'altitude_normal' ? 'Altitude normal (referida ao SGB)' : 'Cota (referência arbitrária)'],
+    ['Referência', `${cab.pontoRef || '—'}: ${cab.H_ref || '—'} m ± ${cab.sigmaRef_mm || '0'} mm`],
+  ];
+  if (modo === 'transporte' && cab.pontoChegada) ident.push(['RN de chegada', cab.pontoChegada]);
+  if (modo === 'linha') ident.push(['RN de chegada', `${cab.pontoChegada || '—'}: ${cab.H_chegada || '—'} m ± ${cab.sigmaChegada_mm || '0'} mm`]);
+  ident.push(['Nível', `${ins?.rotulo ?? '—'} (σ ${cab.sigmaLeitura_mm || '—'} mm a ${cab.distanciaRef_m || '—'} m; ${cab.sigmaKm_mm || '—'} mm/km)`]);
+  if (modo !== 'irradiacao' && classe) ident.push(['Classe', `${classe.rotulo} — ${classe.tol_mm_raizK}√K`]);
+  return {
+    titulo: `Nivelamento geométrico — ${nomeMetodo(modo)}`,
+    projeto: $('nome-projeto').value.trim(), modo, identificacao: ident, parametros: 'parametros',
+    secoes: [
+      { titulo: 'Caderneta de campo', conteudo: tabelaEnxuta($('caderneta').querySelector('table'), { tirarColunas: ['Situação'] }) },
+      { titulo: modo === 'irradiacao' ? 'Verificação' : 'Verificação, fechamento e tolerância', conteudo: cartoes('verificacao', 'distancias', 'fechamento', 'tolerancias', 'transporte') },
+      { titulo: `${rot}s calculadas`, conteudo: bloco('tabela-pontos') },
+      { titulo: 'Estações', conteudo: bloco('tabela-estacoes') },
+      { titulo: 'Perfil', conteudo: bloco('perfil') },
+      { titulo: 'Avisos do cálculo', conteudo: $('mensagens').querySelector('li') ? bloco('mensagens') : null },
+    ],
+    memoria: memoriaGeometrico(cab),
+    tabelaResultados: $('tabela-pontos').querySelector('table'),
+    tabelaCaderneta: $('caderneta').querySelector('table'),
+    planilhasExtras: [{ nome: 'Estações', tabela: $('tabela-estacoes').querySelector('table') }],
+  };
+}
+
 // ---------- Projeto em arquivo (.niv) ----------
 function salvarProjeto() {
   const p = criarProjeto({
     nome: $('nome-projeto').value.trim(), tipoAltura: tipoAltura(), modulo: 'geometrico', modo,
-    cabecalho: lerCabecalho(), linhas: caderneta.obterLinhas(),
+    cabecalho: lerCabecalho(), linhas: caderneta.obterLinhas(), relatorio: obterDadosRelatorio(),
   });
   const blob = new Blob([serializarProjeto(p)], { type: 'application/json' });
   const a = document.createElement('a');
@@ -422,6 +484,7 @@ async function abrirProjeto(ev) {
   modo = MODOS[p.modo] ? p.modo : 'irradiacao';
   $('nome-projeto').value = p.nome || '';
   definirTipoAltura(p.tipoAltura);
+  definirDadosRelatorio(p.relatorio);
   definirCabecalho({ pontoChegada: '', H_chegada: '', sigmaChegada_mm: '', ...p.cabecalho });
   mostrarModo();
   caderneta.definirLinhas(p.linhas);
@@ -482,7 +545,8 @@ async function iniciar() {
     mostrarModo();
     caderneta.definirLinhas(ex.linhas);
   });
-  $('bt-imprimir').addEventListener('click', () => window.print());
+  iniciarRelatorio({ pagina: 'geometrico', contexto: contextoRelatorio });
+  botaoPng('perfil', () => nomeArquivo($('nome-projeto').value.trim(), modo).replace(/\.niv$/, '_perfil.png'));
 }
 
 iniciar();

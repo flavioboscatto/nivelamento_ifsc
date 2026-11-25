@@ -8,7 +8,7 @@ export const EXTENSAO = '.niv';
 const TIPOS_ALTURA = ['cota', 'altitude_normal'];
 
 /** Monta o objeto do projeto. Nada de resultados: tudo é recalculado ao abrir. */
-export function criarProjeto({ nome = '', tipoAltura = 'cota', modulo, modo, cabecalho = {}, linhas = [], agora = new Date() }) {
+export function criarProjeto({ nome = '', tipoAltura = 'cota', modulo, modo, cabecalho = {}, linhas = [], relatorio = {}, agora = new Date() }) {
   return {
     formato: FORMATO,
     versao: VERSAO,
@@ -19,6 +19,7 @@ export function criarProjeto({ nome = '', tipoAltura = 'cota', modulo, modo, cab
     modulo,
     modo,
     cabecalho,
+    relatorio,
     linhas: linhas.filter((l) => Object.values(l).some((v) => String(v ?? '').trim() !== '')),
   };
 }
@@ -51,6 +52,7 @@ export function lerProjeto(texto, { modulo } = {}) {
       ...p,
       tipoAltura: TIPOS_ALTURA.includes(p.tipoAltura) ? p.tipoAltura : 'cota',
       cabecalho: p.cabecalho && typeof p.cabecalho === 'object' ? p.cabecalho : {},
+      relatorio: p.relatorio && typeof p.relatorio === 'object' ? p.relatorio : {},
       linhas,
     },
   };

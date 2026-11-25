@@ -117,3 +117,13 @@ test('mensagens do trigonométrico', () => {
   const r2 = calcularTrigonometrico([{ estacao: 'X', ponto: 'A', zpd: '90', di: 10 }], { H_ref: 10, pontoRef: 'E', nomeAltura: 'altitude' });
   assert.match(r2.erros[0], /sem ré e sem altitude conhecida/);
 });
+
+test('tabela de curvatura e refração (doc 2, 2.3.2) e efeito residual no geométrico', async () => {
+  const { tabelaCurvaturaRefracao, efeitoResidualGeometrico } = await import('../src/core/trigonometrico.js');
+  const t = tabelaCurvaturaRefracao([80, 125, 150, 300, 500], norma.R_m, norma.k);
+  [0.4, 1.1, 1.5, 6.1, 17.1].forEach((mm, n) => perto(t[n].cr * 1000, mm, 0.05, `c+r ${t[n].DH} m`));
+  perto(t[4].c + t[4].r, t[4].cr, 1e-15, 'c + r');
+  // AA p. 31: abaixo de 1 mm para DH < 120 m
+  assert.ok(Math.abs(efeitoResidualGeometrico(119, 0, norma.R_m, norma.k)) < 0.001);
+  perto(efeitoResidualGeometrico(60, 50, norma.R_m, norma.k), curvaturaRefracao(60, norma.R_m, norma.k) - curvaturaRefracao(50, norma.R_m, norma.k), 1e-15, 'residual');
+});

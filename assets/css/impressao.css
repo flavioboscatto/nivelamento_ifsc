@@ -1,10 +1,70 @@
-/* impressao.css — relatório: fontes pretas, tabelas sem preenchimento, sem cores da tela */
-@media print {
-  @page { size: A4; margin: 18mm 16mm 20mm; }
-  :root { --verde: #000; --verde-escuro: #000; --texto: #000; --texto-titulo: #000; --borda: #000; --fundo: #fff; --fundo-alt: #fff; }
-  body { font-size: 11pt; color: #000; background: #fff; }
-  .cabecalho, .rodape, .nao-imprimir, .botao, nav { display: none !important; }
-  table { border-collapse: collapse; width: 100%; }
-  th, td { border: 0.5pt solid #000; background: none !important; color: #000 !important; padding: 2pt 4pt; }
-  a { color: #000; text-decoration: none; }
+/* impressao.css — relatório (etapa 11): fontes pretas, tabelas sem preenchimento, títulos numerados.
+   O rodapé (programa, data/hora e página) é definido em @page pelo relatorio.js. */
+
+/* Na tela o relatório só aparece na prévia */
+.relatorio { display: none; }
+body.previa > *:not(.relatorio) { display: none !important; }
+body.previa .relatorio { display: block; background: #E9EEEB; min-height: 100vh; padding: 0 0 40px; }
+.barra-previa {
+  position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center;
+  padding: 12px 16px; background: var(--azul-noite); color: #fff;
 }
+.barra-previa .botao { padding: 8px 14px; font-size: 13px; }
+.barra-previa .botao-secundario { color: #fff; border-color: #fff; }
+.folha {
+  background: #fff; color: #000; width: 210mm; max-width: calc(100% - 32px); margin: 24px auto 0; padding: 15mm 14mm 18mm;
+  box-shadow: 0 2px 14px rgba(0,0,0,.18); font-family: Arial, Helvetica, sans-serif; font-size: 10pt; line-height: 1.35;
+}
+.folha * { color: #000 !important; }
+.rel-cab { display: flex; gap: 16px; align-items: center; border-bottom: 1.5pt solid #000; padding-bottom: 8pt; margin-bottom: 10pt; }
+.rel-cab img { width: 150px; height: auto; }
+.rel-cab h1 { font-size: 15pt; margin: 0 0 2pt; letter-spacing: 0; }
+.rel-cab p { margin: 0; font-size: 8.5pt; }
+.rel-secao { margin-top: 12pt; }
+.rel-secao h2 { font-size: 11.5pt; margin: 0 0 6pt; border-bottom: 0.5pt solid #000; padding-bottom: 2pt; break-after: avoid; letter-spacing: 0; display: block; }
+.rel-secao h3 { font-size: 10pt; margin: 8pt 0 4pt; }
+.rel-ident { display: grid; grid-template-columns: 1fr; gap: 1.5pt; margin: 0; font-size: 9pt; }
+.rel-ident div { display: flex; gap: 6pt; }
+.rel-ident dt { font-weight: 700; flex: 0 0 42mm; }
+.rel-ident dd { margin: 0; }
+.rel-memoria { margin: 0; padding-left: 16pt; }
+.rel-memoria li { margin: 2pt 0; }
+.folha table { border-collapse: collapse; width: 100%; font-size: 7.5pt; font-variant-numeric: tabular-nums; margin: 2pt 0 6pt; }
+.folha th, .folha td { border: 0.5pt solid #000; background: none !important; padding: 1.5pt 3pt; text-align: left; font-weight: 400; white-space: nowrap; }
+.folha thead th { font-weight: 700; white-space: normal; vertical-align: bottom; line-height: 1.15; }
+.folha thead th small { font-weight: 400; }
+.folha tbody th { font-weight: 700; }
+.folha .n { text-align: right !important; }
+.folha tr { break-inside: avoid; }
+.folha .calculado { font-style: italic; }
+.folha .lista-def { gap: 1pt; font-size: 9pt; }
+.folha .lista-def div { border-bottom: 0; padding: 0; display: flex; justify-content: space-between; gap: 10pt; }
+.folha .lista-def dt { color: #000; }
+.folha .lista-def dd { font-weight: 400; }
+.folha .grade-rel { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt 18pt; }
+.folha .status { font-size: 9.5pt; margin: 4pt 0 0; font-weight: 700; }
+.folha .nota { font-size: 8pt; margin: 3pt 0 0; display: block !important; }
+.folha .msgs { font-size: 8.5pt; padding-left: 14pt; }
+.folha .titulo-msg { font-size: 9pt; margin: 4pt 0 2pt; }
+.folha svg.perfil { width: 100%; max-height: 80mm; }
+.folha svg .traco, .folha svg .media { stroke: #000 !important; }
+.folha svg .ponto circle, .folha svg .obs circle { fill: #000 !important; stroke: #fff !important; }
+.folha svg .ponto.irradiado circle, .folha svg .obs.fora circle { fill: #fff !important; stroke: #000 !important; }
+.folha svg text { fill: #000 !important; }
+.folha svg .grade { stroke: #bbb !important; }
+.folha svg .media-todas, .folha svg .limite, .folha svg .eixo-linha { stroke: #000 !important; }
+.rel-rodape-tela { margin-top: 18pt; border-top: 0.5pt solid #000; padding-top: 4pt; font-size: 8pt; }
+
+@media print {
+  html, body { background: #fff !important; }
+  body > *:not(.relatorio) { display: none !important; }
+  .relatorio { display: block !important; background: none !important; padding: 0 !important; min-height: 0 !important; }
+  .barra-previa, .rel-rodape-tela { display: none !important; }
+  .folha { width: auto; max-width: none; margin: 0; padding: 0; box-shadow: none; }
+}
+/* A caderneta copiada da tela traz classes com medidas de tela: neutraliza */
+.folha .caderneta th, .folha .caderneta td, .folha .caderneta .calc, .folha .caderneta .num-linha {
+  min-width: 0 !important; padding: 1.5pt 3pt !important; box-shadow: none !important; width: auto;
+}
+.folha .caderneta thead th { white-space: normal !important; }
+.folha .caderneta td { white-space: nowrap; }

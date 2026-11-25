@@ -1,7 +1,10 @@
 // paginas/apoio.js — estatística de séries de observações (etapa 7; AA Exemplo I).
 import { analisarSerie, lerSerie } from '../../core/estatistica.js';
+import { tabelaCurvaturaRefracao, efeitoResidualGeometrico } from '../../core/trigonometrico.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
+import { botaoPng } from '../figuras.js';
+import { iniciarRelatorio, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
 
 const CHAVE_RASCUNHO = 'nivelamento-ifsc.apoio.v1';
 const $ = (id) => document.getElementById(id);
@@ -136,13 +139,34 @@ function graficoSerie(obs, r, { un, fx }) {
   </svg>`;
 }
 
+// ---------- Curvatura e refração ----------
+let norma = null;
+function recalcularCR() {
+  if (!norma) return;
+  const R = parseDecimal($('cr-raio').value), k = parseDecimal($('cr-k').value);
+  const dist = lerSerie($('cr-distancias').value, parseDecimal).valores.filter((d) => d > 0);
+  if (!(R > 0) || !Number.isFinite(k)) { $('tabela-cr').innerHTML = '<p class="status falha">Informe R (m) e k.</p>'; $('resultado-residual').textContent = ''; return; }
+  const t = tabelaCurvaturaRefracao(dist, R, k);
+  const lim = norma.curvRefracaoAcima_m;
+  $('tabela-cr').innerHTML = `<table class="tabela-resultado">
+    <thead><tr><th scope="col" class="n">DH (m)</th><th scope="col" class="n">Curvatura c (mm)</th><th scope="col" class="n">Refração r (mm)</th>
+      <th scope="col" class="n">c + r (mm)</th><th scope="col">NBR 13133:2021</th></tr></thead>
+    <tbody>${t.map((l) => `<tr><th scope="row" class="n">${formatar(l.DH, 0)}</th><td class="n">${formatar(l.c * 1000, 1)}</td>
+      <td class="n">${formatar(l.r * 1000, 1)}</td><td class="n"><strong>${formatar(l.cr * 1000, 1)}</strong></td>
+      <td>${l.DH > lim ? 'considerar c + r e visadas recíprocas' : 'pode ser desprezada'}</td></tr>`).join('')}</tbody></table>`;
+  const re = parseDecimal($('res-re').value), va = parseDecimal($('res-vante').value);
+  $('resultado-residual').innerHTML = Number.isFinite(re) && Number.isFinite(va)
+    ? `Efeito residual: <strong>${formatarComSinal(efeitoResidualGeometrico(re, va, R, k) * 1000, 2)} mm</strong> (diferença ré − vante de ${formatar(re - va, 1)} m)`
+    : 'Informe as duas distâncias.';
+}
+
 function salvarRascunho() {
   try { localStorage.setItem(CHAVE_RASCUNHO, JSON.stringify({ nome: $('nome-projeto').value, ...lerForm() })); } catch { /* sem armazenamento */ }
 }
 
 function salvarProjeto() {
   const d = lerForm();
-  const p = criarProjeto({ nome: $('nome-projeto').value.trim(), modulo: 'apoio', modo: 'estatistica', cabecalho: d, linhas: [{ valores: d.valores }] });
+  const p = criarProjeto({ nome: $('nome-projeto').value.trim(), modulo: 'apoio', modo: 'estatistica', cabecalho: d, linhas: [{ valores: d.valores }], relatorio: obterDadosRelatorio() });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([serializarProjeto(p)], { type: 'application/json' }));
   a.download = nomeArquivo(p.nome, 'estatistica');
@@ -156,6 +180,7 @@ async function abrirProjeto(ev) {
   const r = lerProjeto(await arq.text(), { modulo: 'apoio' });
   if (!r.ok) { alert(r.erro); return; }
   $('nome-projeto').value = r.projeto.nome || '';
+  definirDadosRelatorio(r.projeto.relatorio);
   definirForm(r.projeto.cabecalho);
   recalcular();
 }
@@ -177,11 +202,46 @@ function iniciar() {
   $('nome-projeto').addEventListener('input', salvarRascunho);
   $('bt-exemplo').addEventListener('click', () => { definirForm(EXEMPLO); recalcular(); });
   $('bt-limpar').addEventListener('click', () => { if (confirm('Apagar os valores digitados?')) { definirForm({ valores: '', excluidas: [] }); recalcular(); } });
-  $('bt-imprimir').addEventListener('click', () => window.print());
+  iniciarRelatorio({
+    pagina: 'apoio',
+    contexto: () => {
+      const d = lerForm();
+      return {
+        titulo: 'Estatística de série de observações', projeto: $('nome-projeto').value.trim(), modo: 'estatistica',
+        identificacao: [['Grandeza', d.grandeza], ['Critério para atípicas', d.criterio === 'fixo' ? `limite fixo de ${d.limite} mm` : '3 s, calculado sem a observação testada'],
+          ['Atípicas', d.remover ? 'retiradas do resultado final' : 'mantidas no resultado final']],
+        secoes: [
+          { titulo: 'Resultado', conteudo: bloco('resultado-final') },
+          { titulo: 'Resumo', conteudo: cartoes('resumo-todas', 'resumo-final') },
+          { titulo: 'Observações e resíduos', conteudo: bloco('tabela-obs') },
+          { titulo: 'Gráfico', conteudo: bloco('grafico') },
+          { titulo: 'Avisos do cálculo', conteudo: $('mensagens').querySelector('li') ? bloco('mensagens') : null },
+          { titulo: 'Curvatura e refração', conteudo: bloco('tabela-cr') },
+        ],
+        memoria: ['Média x̄ = Σx / n; resíduo v = x̄ − x.', 's = √(Σv² / (n − 1)); desvio-padrão da média s<sub>x̄</sub> = s / √n; resultado x̄ ± s<sub>x̄</sub>.',
+          'Atípica: |x − x̄| maior que 3 s (ou o limite fixo), com x̄ e s calculados sem a observação testada, uma de cada vez (análogo à NBR 13133:2021, 5.2.11).'],
+        tabelaResultados: $('tabela-obs').querySelector('table'),
+        tabelaCaderneta: null,
+        planilhasExtras: [{ nome: 'Curvatura e refração', tabela: $('tabela-cr').querySelector('table') }],
+      };
+    },
+  });
   $('bt-salvar').addEventListener('click', salvarProjeto);
   $('bt-abrir').addEventListener('click', () => $('arquivo-projeto').click());
   $('arquivo-projeto').addEventListener('change', abrirProjeto);
   recalcular();
+  fetch(new URL('../../../data/norma_nbr13133_2021.json', import.meta.url)).then((r) => r.json()).then((n) => {
+    norma = n;
+    $('cr-raio').value = String(n.R_m);
+    $('cr-k').value = formatar(n.k, 2);
+    $('cr-limiar').textContent = formatar(n.curvRefracaoAcima_m, 0);
+    recalcularCR();
+  }).catch(() => { $('tabela-cr').innerHTML = '<p class="status falha">Não foi possível ler os parâmetros da norma (pasta data/).</p>'; });
+  botaoPng('grafico', () => nomeArquivo($('nome-projeto').value.trim(), 'estatistica').replace(/\.niv$/, '_grafico.png'));
+  $('form-cr').addEventListener('input', recalcularCR);
+  $('form-residual').addEventListener('input', recalcularCR);
+  $('form-cr').addEventListener('submit', (e) => e.preventDefault());
+  $('form-residual').addEventListener('submit', (e) => e.preventDefault());
 }
 
 iniciar();

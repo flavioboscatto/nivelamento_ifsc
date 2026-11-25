@@ -3,7 +3,7 @@
 // Ver docs/02_METODOS_E_FORMULAS.md (2.3) e docs/04_PROPAGACAO_PRECISOES.md (4.2.1, 4.4).
 
 import { parseDecimal, formatar } from './numeros.js';
-import { parseAngulo, zenitalPdPi, RAD_POR_SEGUNDO, formatarDms } from './angulos.js';
+import { lerAnguloSexagesimal as parseAngulo, zenitalPdPi, RAD_POR_SEGUNDO, formatarDms, AJUDA_ANGULO } from './angulos.js';
 import { avaliarFechamento } from './tolerancias.js';
 import { correcaoProporcional } from './ajustamento.js';
 import { sigmaCircuito, sigmaLinha, sigmaAnexoLCircuito, sigmaAnexoLLinha } from './propagacao.js';
@@ -105,11 +105,11 @@ export function calcularTrigonometrico(linhas, op = {}) {
 
     const zpd = parseAngulo(b.zpd);
     if (vazio(b.zpd)) { L.erro('falta o ângulo zenital.'); return; }
-    if (!Number.isFinite(zpd)) { L.erro(`o ângulo zenital "${b.zpd}" não é válido (use 91°19'40", 91 19 40 ou decimal).`); return; }
+    if (!Number.isFinite(zpd)) { L.erro(`o ângulo zenital "${b.zpd}" não é válido (${AJUDA_ANGULO}).`); return; }
     L.Z = zpd;
     if (!vazio(b.zpi)) {
       const zpi = parseAngulo(b.zpi);
-      if (!Number.isFinite(zpi)) { L.erro(`o ângulo zenital em PI "${b.zpi}" não é válido.`); return; }
+      if (!Number.isFinite(zpi)) { L.erro(`o ângulo zenital em PI "${b.zpi}" não é válido (${AJUDA_ANGULO}).`); return; }
       const r = zenitalPdPi(zpd, zpi);
       L.Z = r.z; L.erroIndice = r.erroIndice;
     }
@@ -271,3 +271,14 @@ export function visadasReciprocas(ida, volta, { R = 6371000, k = 0.13, sigmaZ_s 
 }
 
 export { formatarDms };
+
+/**
+ * Tabela didática de curvatura e refração (doc 2, 2.2.10 e 2.3.2):
+ *  c = DH²/2R (curvatura); r = −k·DH²/2R (refração); c+r = (1 − k)·DH²/2R.
+ */
+export function tabelaCurvaturaRefracao(distancias, R, k) {
+  return distancias.map((DH) => ({ DH, c: DH ** 2 / (2 * R), r: -k * DH ** 2 / (2 * R), cr: curvaturaRefracao(DH, R, k) }));
+}
+
+/** Efeito que sobra no geométrico com visadas desiguais: c+r(DH ré) − c+r(DH vante) (doc 2, 2.2.10). */
+export const efeitoResidualGeometrico = (dhRe, dhVante, R, k) => curvaturaRefracao(dhRe, R, k) - curvaturaRefracao(dhVante, R, k);

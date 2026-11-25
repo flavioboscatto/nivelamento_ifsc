@@ -104,3 +104,17 @@ export function zenitalPdPi(zPD, zPI) {
     erroIndice: (zPD + zPI - volta) / 2,
   };
 }
+
+/**
+ * Entrada padrão do site: ângulo sexagesimal (D33). Aceita GG,MMSS (formato dos equipamentos e
+ * calculadoras: 91,1940 = 91°19'40"; 91,19405 = 91°19'40,5"), e também 91°19'40" ou 91 19 40.
+ * Não aceita grados nem graus decimais. Retorna radianos ou NaN.
+ */
+export function lerAnguloSexagesimal(texto) {
+  if (typeof texto === 'number') return parseAngulo(String(texto), { ddmmss: true });
+  if (texto === null || texto === undefined || /g/i.test(String(texto))) return NaN;
+  return parseAngulo(texto, { ddmmss: true });
+}
+
+/** Mensagem padrão para ângulo inválido. */
+export const AJUDA_ANGULO = 'use GG,MMSS — ex.: 91,1940 = 91°19\'40"';

@@ -3,7 +3,7 @@
 // Ver docs/02_METODOS_E_FORMULAS.md (2.4) e docs/04_PROPAGACAO_PRECISOES.md (4.5).
 
 import { parseDecimal, formatar } from './numeros.js';
-import { parseAngulo, reduzir2Pi, RAD_POR_SEGUNDO } from './angulos.js';
+import { lerAnguloSexagesimal as parseAngulo, reduzir2Pi, RAD_POR_SEGUNDO, AJUDA_ANGULO } from './angulos.js';
 
 /**
  * Estadimetria (AA Eq. 29–35): S = FS − FI;  DH = C·S·sen²Z;  DV = ½·C·S·sen 2Z
@@ -55,7 +55,7 @@ export function calcularTaqueometria(linhas, op = {}) {
   const ref = String(pontoRef || '').trim();
   if (Number.isFinite(H0)) conhecidos.set(ref || '(referência)', { H: H0, X: temXY ? X0 : NaN, Y: temXY ? Y0 : NaN, sigma: sigmaRef_m });
   const az0 = vazio(azRef) ? 0 : parseAngulo(azRef);
-  if (!Number.isFinite(az0)) erros.push(`O azimute de referência "${azRef}" não é válido.`);
+  if (!Number.isFinite(az0)) erros.push(`O azimute de referência "${azRef}" não é válido (${AJUDA_ANGULO}).`);
 
   let est = null;
   linhas.forEach((b, idx) => {
@@ -83,7 +83,7 @@ export function calcularTaqueometria(linhas, op = {}) {
     };
     if (!est) { erro('a primeira linha precisa indicar a estação.'); fim(); return; }
     if (!vazio(b.i)) { const v = parseDecimal(b.i); if (Number.isFinite(v)) est.i = v; else erro(`a altura do instrumento "${b.i}" não é um número.`); }
-    if (!vazio(b.azref)) { const v = parseAngulo(b.azref); if (Number.isFinite(v)) est.az = v; else erro(`o azimute de referência "${b.azref}" não é válido.`); }
+    if (!vazio(b.azref)) { const v = parseAngulo(b.azref); if (Number.isFinite(v)) est.az = v; else erro(`o azimute de referência "${b.azref}" não é válido (${AJUDA_ANGULO}).`); }
     if (campos.slice(3).every((c) => vazio(b[c]))) { L.vazia = true; fim(); return; } // só a estação
 
     if (!L.ponto) erro('falta o nome do ponto visado.');
@@ -95,9 +95,9 @@ export function calcularTaqueometria(linhas, op = {}) {
     }
     const Z = parseAngulo(b.z);
     if (vazio(b.z)) erro('falta o ângulo zenital.');
-    else if (!(Z > 0 && Z < Math.PI)) erro(`o ângulo zenital "${b.z}" não é válido (entre 0° e 180°).`);
+    else if (!(Z > 0 && Z < Math.PI)) erro(`o ângulo zenital "${b.z}" não é válido (${AJUDA_ANGULO}; entre 0° e 180°).`);
     const Hz = vazio(b.hz) ? NaN : parseAngulo(b.hz);
-    if (!vazio(b.hz) && !Number.isFinite(Hz)) erro(`o ângulo horizontal "${b.hz}" não é válido.`);
+    if (!vazio(b.hz) && !Number.isFinite(Hz)) erro(`o ângulo horizontal "${b.hz}" não é válido (${AJUDA_ANGULO}).`);
     if (!Number.isFinite(est.i)) erro(`informe a altura do instrumento (i) da estação ${est.rotulo}.`);
     if (L.erros.length || !est.base) { fim(); return; }
 

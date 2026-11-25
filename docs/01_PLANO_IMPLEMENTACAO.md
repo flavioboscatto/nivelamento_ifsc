@@ -175,7 +175,7 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Aceite:** S01/S02; gráfico igual às Figuras 7 e 8 da AA; detecção do atípico (obs. 7).
 - **Feito:** `apoio.html` com resultado x̄ ± s_x̄ (12,791 ± 0,002 m no Exemplo I), resumo com todas e final, resíduos, atípica pela obs. 7, exclusão manual, gráfico (observações, média final, média com todas, ±3 s) e projeto `.niv`. As Figuras 7 e 8 não estão no repositório; comparar o gráfico com a apostila no teste manual.
 
-### Etapa 8 — Ferramentas auxiliares
+### Etapa 8 — Ferramentas auxiliares — *dispensada (D34)*
 - Conversor angular, Anexo C (A01), c+r (A04), GNSS → altitude normal (A02, A03).
 
 ### Etapa 9 — Importação Leica Sprinter
@@ -186,9 +186,11 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Pré-requisito:** arquivos de amostra de cada estação.
 - **Aceite:** amostras importadas corretamente para o módulo trigonométrico/taqueométrico; mapeador CSV lê qualquer planilha com colunas nomeadas.
 
-### Etapa 11 — Relatórios e exportações
+### Etapa 11 — Relatórios e exportações — *concluída em 25/11/2026 (64 testes), aguardando teste de impressão*
 - **Objetivo:** relatório para impressão/PDF (fontes pretas, tabelas sem preenchimento, títulos numerados, rodapé com programa, data/hora e página), contendo os itens da NBR 5.8 aplicáveis: objeto, finalidade, data, referência altimétrica, instrumentos, equipe, precisões, memória de cálculo. CSV e `.nivel.json`.
 - **Aceite:** relatório de G04 e de T01 impresso em A4 sem cortes; CSV abre no Excel/LibreOffice com vírgula decimal.
+- **Feito:** botões "Prévia do relatório", "Relatório / PDF", "CSV da caderneta" e "CSV dos resultados" nas páginas de cálculo; relatório com identificação (projeto, objeto, finalidade, local, data, equipe, operador, norma, método, cota/altitude, referência, instrumento, classe, distribuição e propagação), caderneta sem colunas vazias, fechamento e tolerância, cotas com σ, perfil, avisos e memória de cálculo; rodapé por `@page` (Chrome/Edge; o Safari não imprime o rodapé). G04 e T01 cabem na largura A4 na prévia; falta imprimir em papel/PDF.
+- **Acrescentado (D35):** botões "Planilha (.xlsx)" e "Relatório Word (.docx)" nas três páginas e "Baixar figura (.png)" sob o perfil e o gráfico. Arquivos do G04 e da série S01 conferidos no LibreOffice (xlsx com 4 abas e números como números; docx de 3 páginas com rodapé "Página X de Y").
 
 ### Etapa 12 — Ajustamento MMQ e inspeção (opcional)
 - Rede com vários circuitos/RN; $\hat\sigma_0$; módulo de inspeção (Tabela 7 e critério 7.3.1 — 90 % dos pontos ≤ 3σ).
@@ -224,6 +226,10 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 | D29 | Status dos pontos: Ré, Vante e Irradiado ("Irad."); cada linha da caderneta tem uma lista de status que move a leitura de coluna (dados do nível vêm sem código) | 25/11/2026 |
 | D30 | Cota ou Altitude escolhida no início da página; rótulos e mensagens seguem a escolha | 25/11/2026 |
 | D31 | Projeto salvo/aberto em arquivo `.niv` (JSON próprio, versionado) | 25/11/2026 |
+| D33 | Ângulos sempre sexagesimais, digitados em GG,MMSS (formato dos equipamentos); sem conversor angular | 25/11/2026 |
+| D34 | Etapa 8 dispensada: sem conversor angular; GNSS → altitude normal adiado; Anexo C e c+r já usados dentro do trigonométrico | 25/11/2026 |
+| D35 | Exportações em `.xlsx` (planilhas), `.docx` (relatório editável; o PDF continua) e `.png` (figuras), com geradores próprios em `src/io/` (ZIP sem compressão + Office Open XML), sem SheetJS nem outra dependência | 25/11/2026 |
+| D36 | Tabela didática de curvatura e refração (e efeito residual no geométrico) na página de apoio | 25/11/2026 |
 | D32 | Página "Sobre a norma": só a indicação das seções de onde saíram as fórmulas de cálculo e de propagação | 25/11/2026 |
 
 ### 1.5.2 Decisões pendentes
