@@ -28,3 +28,10 @@ export function htmlMensagens(erros, alertas, { okTexto = '✓ Sem erros nem ale
     ${a.length ? `<h3 class="titulo-msg alerta">Atenção (${a.length})</h3><ul class="msgs alerta">${a.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
     ${!e.length && !a.length && mostrarOk ? `<p class="status ok">${okTexto}</p>` : ''}`;
 }
+
+/** HTML do passo a passo (modo aula). Só <sub> é permitido no texto; o resto é escapado. */
+export function htmlPassos(grupos) {
+  if (!grupos.length) return '<p class="ajuda-curta">Digite a caderneta para ver as contas.</p>';
+  const linha = (t) => esc(t).replace(/&lt;(\/?)sub&gt;/g, '<$1sub>');
+  return grupos.map((g) => `<h4>${esc(g.titulo)}</h4><ul>${g.linhas.map((l) => `<li>${linha(l)}</li>`).join('')}</ul>`).join('');
+}

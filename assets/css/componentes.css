@@ -298,3 +298,11 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 .tabela-resultado tr > :first-child { position: sticky; left: 0; z-index: 1; box-shadow: 6px 0 6px -5px rgba(12, 28, 40, .2); }
 .tabela-resultado thead tr > :first-child { z-index: 3; }
 .tabela-resultado thead th { background: var(--fundo-alt); }
+
+/* ---------- Passo a passo (modo aula) ---------- */
+.passo-a-passo { margin-top: 28px; border: 1px solid var(--borda); border-left: 4px solid var(--verde); padding: 12px 16px; }
+.passo-a-passo > summary { cursor: pointer; font-weight: 700; color: var(--texto-titulo); }
+.passos-conteudo h4 { font-size: 15px; margin: 16px 0 4px; }
+.passos-conteudo ul { margin: 0; padding-left: 18px; font-size: 15px; color: var(--texto-titulo); font-variant-numeric: tabular-nums; }
+.passos-conteudo li { margin: 2px 0; white-space: pre-wrap; }
+.aviso-offline { background: var(--alerta); color: #fff; font-size: 14px; font-weight: 600; text-align: center; padding: 6px 12px; }

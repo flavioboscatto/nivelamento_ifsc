@@ -1,0 +1,16 @@
+{
+  "name": "Calculadora de Nivelamento IFSC",
+  "short_name": "Nivelamento",
+  "description": "Nivelamento geométrico e trigonométrico pela ABNT NBR 13133:2021 — Curso Técnico em Agrimensura, IFSC.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0C1C28",
+  "icons": [
+    { "src": "assets/img/icone_192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/img/icone_512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/img/icone_maskable_512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

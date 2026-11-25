@@ -86,3 +86,25 @@ export function montarLayout() {
 }
 
 montarLayout();
+
+// Funcionamento sem internet (uso em campo): guarda o site no navegador na primeira visita.
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => { /* sem suporte: segue online */ }); });
+}
+
+// Aviso discreto quando está sem internet
+function avisoConexao() {
+  let aviso = document.getElementById('aviso-offline');
+  if (navigator.onLine) { aviso?.remove(); return; }
+  if (!aviso) {
+    aviso = document.createElement('div');
+    aviso.id = 'aviso-offline';
+    aviso.className = 'aviso-offline nao-imprimir';
+    aviso.setAttribute('role', 'status');
+    aviso.textContent = 'Sem internet — usando a cópia guardada no navegador.';
+    document.body.prepend(aviso);
+  }
+}
+window.addEventListener('online', avisoConexao);
+window.addEventListener('offline', avisoConexao);
+avisoConexao();

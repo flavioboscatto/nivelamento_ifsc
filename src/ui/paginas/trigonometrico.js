@@ -5,7 +5,8 @@ import { calcularTaqueometria } from '../../core/taqueometria.js';
 import { lerAnguloSexagesimal as parseAngulo, formatarDms, AJUDA_ANGULO } from '../../core/angulos.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
-import { htmlMensagens } from '../mensagens.js';
+import { htmlMensagens, htmlPassos } from '../mensagens.js';
+import { passosTrigonometrico, passosTaqueometria } from '../../core/passos.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
 import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
 
@@ -217,6 +218,7 @@ function mostrarNormal(linhas, op) {
   });
   mostrarMensagens(r.erros, r.alertas, r.pontos.length);
   mostrarFechamento(f);
+  $('passos').innerHTML = htmlPassos(passosTrigonometrico(r, { rot: rotAltura(), R: op.R, k: op.k }));
 
   const rot = rotAltura();
   const comF = f?.calculado;
@@ -323,6 +325,7 @@ function mostrarTaqueometria(linhas, op) {
       },
     });
   });
+  $('passos').innerHTML = htmlPassos(passosTaqueometria(r, { rot: rotAltura() }));
   mostrarMensagens(r.erros, r.alertas, r.pontos.length);
   const rot = rotAltura();
   const temXY = r.pontos.some((p) => Number.isFinite(p.X));

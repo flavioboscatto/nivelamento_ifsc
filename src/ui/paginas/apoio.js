@@ -1,5 +1,7 @@
 // paginas/apoio.js — estatística de séries de observações (etapa 7; AA Exemplo I).
 import { analisarSerie, lerSerie } from '../../core/estatistica.js';
+import { passosSerie } from '../../core/passos.js';
+import { htmlPassos } from '../mensagens.js';
 import { tabelaCurvaturaRefracao, efeitoResidualGeometrico } from '../../core/trigonometrico.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
@@ -56,7 +58,7 @@ function recalcular() {
 
   if (valores.length < 3) {
     $('mensagens').innerHTML = `${erros.length ? `<ul class="msgs erro">${erros.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}<p class="status neutro">Digite pelo menos três observações.</p>`;
-    ['resultado-final', 'resumo-todas', 'resumo-final', 'tabela-obs', 'grafico'].forEach((id) => { $(id).innerHTML = ''; });
+    ['resultado-final', 'resumo-todas', 'resumo-final', 'tabela-obs', 'grafico', 'passos'].forEach((id) => { $(id).innerHTML = ''; });
     return;
   }
 
@@ -102,6 +104,7 @@ function recalcular() {
     }).join('')}</tbody></table>`;
 
   $('grafico').innerHTML = graficoSerie(valores, r, { un, fx });
+  $('passos').innerHTML = htmlPassos(passosSerie(valores, r, { casas: c, un }));
 }
 
 /** Gráfico das observações com a linha da média (como as Figuras 7 e 8 da AA). */

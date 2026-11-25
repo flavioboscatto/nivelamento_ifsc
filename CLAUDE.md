@@ -27,7 +27,8 @@ Leia antes de qualquer tarefa:
 - **Entrada de ângulos em GG,MMSS (D33):** `lerAnguloSexagesimal` em `angulos.js`, usado no trigonométrico e na taqueometria.
 - **Etapa 11 concluída (aguardando teste de impressão):** `src/ui/relatorio.js` (prévia A4, impressão/PDF com títulos numerados, rodapé com programa, data/hora e página via `@page`), `src/io/csv.js` (CSV com `;`, vírgula decimal, BOM); dados do relatório (objeto, finalidade, local, data, equipe, operador) nas três páginas e no `.niv`; 64 testes. G04 e T01 cabem na largura A4 na prévia.
 - **Exportações (25/11/2026):** planilha `.xlsx` (abas Identificação, Caderneta, Resultados e extras), relatório Word `.docx` editável (mesmo conteúdo do PDF, com logo, tabelas, figuras e rodapé com página) e figuras `.png` (perfil, gráfico da série). Geradores próprios sem dependências: `src/io/zip.js`, `xlsx.js`, `docx.js`, `src/ui/figuras.js`. Tabela de curvatura e refração na página de apoio. 70 testes.
-- **Próximas etapas:** 9–10 (importação) aguardam arquivos de amostra; 12 (MMQ, opcional), 13 (modo aula e PWA offline), 14 (publicação e validação com a turma).
+- **Etapa 13 concluída (aguardando teste em celular):** passo a passo com os números (`src/core/passos.js`, painel "Passo a passo (modo aula)" nas páginas); funcionamento offline com `sw.js` (rede primeiro, cópia guardada sem internet), `manifest.webmanifest` e ícones; aviso "Sem internet". **Ao publicar mudanças, aumentar `VERSAO` em `sw.js` e incluir arquivos novos na lista** (o teste `tests/pwa.test.js` acusa se faltar). 80 testes.
+- **Próximas etapas:** 9–10 (importação) aguardam arquivos de amostra; 12 (MMQ, opcional); 14 (publicação e validação com a turma).
 - Regra geral: **seguir sempre a NBR 13133:2021** (D23–D27).
 - Aguardando: arquivos de amostra (etapas 9–10); modelos/fichas técnicas dos equipamentos; conferência do caso Q01.
 

@@ -195,8 +195,10 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 ### Etapa 12 — Ajustamento MMQ e inspeção (opcional)
 - Rede com vários circuitos/RN; $\hat\sigma_0$; módulo de inspeção (Tabela 7 e critério 7.3.1 — 90 % dos pontos ≤ 3σ).
 
-### Etapa 13 — Modo aula e PWA
+### Etapa 13 — Modo aula e PWA — *concluída em 25/11/2026 (80 testes), aguardando teste em celular*
 - Exemplos das apostilas em `data/exemplos/`, botão "mostrar fórmula/passo a passo", funcionamento offline (service worker) para uso em campo sem internet.
+
+- **Feito:** painel recolhido "Passo a passo (modo aula)" com as contas e os números de cada estação, ponto e fechamento (geométrico, trigonométrico, taqueometria e série); exemplos das apostilas por modo; `sw.js` (rede primeiro, cópia offline), `manifest.webmanifest` (instalável no celular) e aviso de "Sem internet". Lógica offline testada por simulação no Node; o navegador embutido do app não aceita service worker, então falta testar no celular/Chrome com o site publicado.
 
 ### Etapa 14 — Publicação e validação com turma
 - Publicar (GitHub Pages ou servidor do curso), link no menu do site, teste em aula, coleta de correções.

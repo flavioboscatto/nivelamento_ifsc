@@ -6,7 +6,8 @@ import { classeDoNivel } from '../../core/tolerancias.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
 import { perfilSvg } from '../perfil_svg.js';
-import { htmlMensagens } from '../mensagens.js';
+import { htmlMensagens, htmlPassos } from '../mensagens.js';
+import { passosGeometrico } from '../../core/passos.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
 import { botaoPng } from '../figuras.js';
 import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
@@ -194,6 +195,7 @@ function recalcular() {
   });
 
   mostrarResultados(r, cab, avisosCab, classeNivel);
+  $('passos').innerHTML = htmlPassos(passosGeometrico(r, { rot: rotAltura(), sigmaL: Number.isFinite(sL) && dRef > 0 ? sigmaLeituraPorMetro(sL, dRef) : null }));
   salvarRascunho(cab, linhas);
 }
 

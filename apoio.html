@@ -6,6 +6,9 @@
   <meta name="color-scheme" content="light">
   <title>Estatística de Séries — Nivelamento IFSC</title>
   <meta name="description" content="Calculadora de nivelamento geométrico e trigonométrico do Curso Técnico em Agrimensura do IFSC, conforme a ABNT NBR 13133:2021. Cálculo feito no navegador.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0C1C28">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -91,6 +94,10 @@
         <div class="rolagem-tabela" id="tabela-obs"></div>
         <h3 class="subtitulo">Gráfico</h3>
         <div id="grafico" class="caixa-perfil"></div>
+        <details class="passo-a-passo nao-imprimir">
+          <summary>Passo a passo (modo aula)</summary>
+          <div id="passos" class="passos-conteudo"></div>
+        </details>
       </section>
 
       <section class="bloco" aria-labelledby="t-cr">

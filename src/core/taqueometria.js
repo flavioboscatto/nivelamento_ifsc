@@ -106,6 +106,7 @@ export function calcularTaqueometria(linhas, op = {}) {
     if (Math.abs(L.dif3fios) > tol3fios_m) alerta(`fio médio ${formatar(lido.fm, 3)} m difere de (FS + FI)/2 em ${formatar(L.dif3fios * 1000, 1)} mm (limite ${formatar(tol3fios_m * 1000, 1)} mm).`);
     const e = estadimetria({ FS: lido.fs, FI: lido.fi, Z, C });
     L.S = e.S; L.DH = Math.abs(e.DH); L.DV = e.DV * Math.sign(e.S || 1);
+    Object.assign(L, { FS: lido.fs, FM: lido.fm, FI: lido.fi, i: est.i, HE: est.base.H, XE: est.base.X, YE: est.base.Y, Hz, C }); // para o passo a passo
     L.Z = Z;
     L.DN = L.DV + est.i - lido.fm;
     L.H = est.base.H + L.DN;
