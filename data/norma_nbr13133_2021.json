@@ -1,0 +1,27 @@
+{
+  "rotulo": "ABNT NBR 13133:2021",
+  "_fonte": "docs/03_PARAMETROS_NBR13133.md, item 3.6",
+  "geometrico": [
+    {"id": "IN-1", "rotulo": "I N — nível classe 1 — transporte de altitude", "classeNivelMax": 1, "visadaMax_m": 80, "tol_mm_raizK": 6},
+    {"id": "IN-2", "rotulo": "I N — nível classe 2 — rede urbana", "classeNivelMax": 2, "visadaMax_m": 80, "tol_mm_raizK": 8},
+    {"id": "IN-3", "rotulo": "I N — nível classe 3 — poligonal principal", "classeNivelMax": 3, "visadaMax_m": 80, "tol_mm_raizK": 12}
+  ],
+  "trigonometrico": [
+    {"id": "IIN-1", "rotulo": "II N — ET classe 1, duas séries", "classeETMax": 1, "series": 2, "visadaMax_m": 300, "tol_mm_raizK": 120},
+    {"id": "IIN-2", "rotulo": "II N — ET classe 2, uma série", "classeETMax": 2, "series": 1, "visadaMax_m": 200, "tol_mm_raizK": 200},
+    {"id": "IIIN", "rotulo": "III N — taqueométrico", "visadaMax_m": 80, "tol_mm_raizK": null}
+  ],
+  "alturaMinVisada_m": 0.30,
+  "difReVanteMax_m": 10,
+  "curvRefracaoAcima_m": 125,
+  "R_m": 6371000,
+  "k": 0.13,
+  "classesNivel_mm_km": [1, 2, 6, null],
+  "classesET": [{"ang_s": 2, "lin": [1, 1]}, {"ang_s": 5, "lin": [2, 2]}, {"ang_s": 10, "lin": [3, 3]}],
+  "alertasPrograma": {
+    "_nota": "Limites do programa, não da norma (decisão D26). Editáveis na tela.",
+    "tolerancia3fios_m": 0.002,
+    "difReVanteMax_m": 10,
+    "constanteEstadimetrica": 100
+  }
+}

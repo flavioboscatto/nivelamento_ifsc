@@ -14,7 +14,12 @@ Leia antes de qualquer tarefa:
 - **Etapa 1 concluída:** `src/core/numeros.js`, `angulos.js`, `estatistica.js`; 13 testes passando (`node --test`).
 - **Etapa 2 concluída (aguardando aprovação visual):** `assets/css/*`, `src/ui/layout.js`, `index.html` com apresentação e duas opções (Geométrico e Trigonométrico); `geometrico.html`, `trigonometrico.html` e `sobre.html` provisórias.
 - Pendente da etapa 2: confirmar a família tipográfica do site (usando Inter provisoriamente).
-- **Próxima etapa:** Etapa 3 — caderneta geométrica com digitação manual e irradiação.
+- **Etapa 3 concluída (aguardando teste manual do professor):** `src/core/geometrico.js` (caderneta, APV, alturas, distâncias, verificação aritmética, alertas, σ F.1), `src/core/tolerancias.js` (classe do nível), `src/ui/caderneta.js`, `src/ui/perfil_svg.js`, `src/ui/paginas/geometrico.js`, `geometrico.html` (modo irradiação); `data/norma_nbr13133_2021.json`, `data/instrumentos.json`, `data/exemplos/nbr_f2.json`; 27 testes passando.
+- Etapa 3: o "Exemplo I da AA / Tabela 1" do aceite fica para quando o professor tiver os dados (25/11/2026); por ora a irradiação é testada com G01 e com a estação a do circuito G06.
+- Tarefa anotada (25/11/2026): no menu, o último item ("Site do curso") deve abrir em nova guia (`target="_blank" rel="noopener"`) — `src/ui/layout.js`.
+- **Etapa 4 concluída (aguardando teste manual do professor):** `src/core/fechamento.js` (transporte, circuito, linha), `ajustamento.js` (proporcional à distância e por estação), `propagacao.js` (4.3.6 a–c e Anexo L), `tolerancias.js` (T = t√K, Tabela 5); página com quatro modos, rascunho por modo e exemplos AA Ex. I e Tab. 9 em `data/exemplos/`; 38 testes passando (G04–G08, P01, tabela 2021 do doc 7).
+- Pendente da etapa 4: G02 e G03 sem dados no projeto (só a tolerância é testada); linha com várias seções/PS é tratada como uma caderneta por seção.
+- **Próxima etapa:** Etapa 5 — nivelamento trigonométrico.
 - Regra geral: **seguir sempre a NBR 13133:2021** (D23–D27).
 - Aguardando: arquivos de amostra (etapas 9–10); modelos/fichas técnicas dos equipamentos; conferência do caso Q01.
 

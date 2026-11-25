@@ -1,0 +1,14 @@
+{
+  "titulo": "NBR 13133:2021, Anexo F.2 — irradiação de A1 a partir da RN80",
+  "cabecalho": {
+    "pontoRef": "RN80",
+    "H_ref": "9,315",
+    "sigmaRef_mm": "3,4",
+    "tipoAltura": "cota",
+    "instrumento": "sprinter150_eletronica"
+  },
+  "linhas": [
+    { "estacao": "01", "ponto": "RN80", "re": "1,335", "dh": "60,325" },
+    { "estacao": "01", "ponto": "A1", "vante": "1,511", "dh": "55,078" }
+  ]
+}

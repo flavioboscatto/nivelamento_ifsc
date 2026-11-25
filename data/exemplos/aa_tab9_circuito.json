@@ -1,0 +1,171 @@
+{
+  "titulo": "Altimetria Aplicada, Tabela 9 — circuito fechado (DH só de ré e mudanças; DH do ponto 14 do doc 4)",
+  "cabecalho": {
+    "pontoRef": "RN2",
+    "H_ref": "6,500",
+    "sigmaRef_mm": "0",
+    "tipoAltura": "cota",
+    "instrumento": "sprinter150_eletronica",
+    "distribuicao": "estacao",
+    "classe": "IN-3"
+  },
+  "linhas": [
+    {
+      "estacao": "a",
+      "ponto": "RN2",
+      "re": "0,975",
+      "dh": "55,689"
+    },
+    {
+      "ponto": "1",
+      "intermediaria": "1,175",
+      "dh": ""
+    },
+    {
+      "ponto": "2",
+      "intermediaria": "1,692",
+      "dh": ""
+    },
+    {
+      "ponto": "3",
+      "intermediaria": "1,595",
+      "dh": ""
+    },
+    {
+      "ponto": "A1",
+      "vante": "1,383",
+      "dh": "63,436"
+    },
+    {
+      "estacao": "b",
+      "ponto": "A1",
+      "re": "1,438",
+      "dh": "45,400"
+    },
+    {
+      "ponto": "4",
+      "intermediaria": "0,899",
+      "dh": ""
+    },
+    {
+      "ponto": "5",
+      "intermediaria": "0,807",
+      "dh": ""
+    },
+    {
+      "ponto": "A2",
+      "vante": "1,472",
+      "dh": "48,492"
+    },
+    {
+      "estacao": "c",
+      "ponto": "A2",
+      "re": "1,408",
+      "dh": "63,450"
+    },
+    {
+      "ponto": "6",
+      "intermediaria": "1,128",
+      "dh": ""
+    },
+    {
+      "ponto": "7",
+      "intermediaria": "1,508",
+      "dh": ""
+    },
+    {
+      "ponto": "8",
+      "intermediaria": "1,799",
+      "dh": ""
+    },
+    {
+      "ponto": "A3",
+      "vante": "1,510",
+      "dh": "57,439"
+    },
+    {
+      "estacao": "d",
+      "ponto": "A3",
+      "re": "1,389",
+      "dh": "43,678"
+    },
+    {
+      "ponto": "9",
+      "intermediaria": "1,500",
+      "dh": ""
+    },
+    {
+      "ponto": "10",
+      "intermediaria": "1,678",
+      "dh": ""
+    },
+    {
+      "ponto": "PS1",
+      "vante": "1,656",
+      "dh": "39,219"
+    },
+    {
+      "estacao": "e",
+      "ponto": "PS1",
+      "re": "1,572",
+      "dh": "46,689"
+    },
+    {
+      "ponto": "11",
+      "intermediaria": "1,500",
+      "dh": ""
+    },
+    {
+      "ponto": "12",
+      "intermediaria": "1,678",
+      "dh": ""
+    },
+    {
+      "ponto": "13",
+      "intermediaria": "1,462",
+      "dh": ""
+    },
+    {
+      "ponto": "A4",
+      "vante": "1,456",
+      "dh": "53,923"
+    },
+    {
+      "estacao": "f",
+      "ponto": "A4",
+      "re": "1,497",
+      "dh": "51,436"
+    },
+    {
+      "ponto": "14",
+      "intermediaria": "1,500",
+      "dh": "12,356"
+    },
+    {
+      "ponto": "15",
+      "intermediaria": "1,500",
+      "dh": ""
+    },
+    {
+      "ponto": "16",
+      "intermediaria": "1,678",
+      "dh": ""
+    },
+    {
+      "ponto": "A5",
+      "vante": "1,654",
+      "dh": "48,320"
+    },
+    {
+      "estacao": "g",
+      "ponto": "A5",
+      "re": "1,674",
+      "dh": "48,647"
+    },
+    {
+      "ponto": "RN2",
+      "vante": "0,833",
+      "dh": "52,436"
+    }
+  ]
+}

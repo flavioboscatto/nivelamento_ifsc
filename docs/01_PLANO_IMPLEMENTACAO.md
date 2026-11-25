@@ -149,15 +149,17 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Aceite:** visual coerente com o site em desktop e celular (390 px) sem rolagem horizontal; aprovado pelo professor.
 - **Teste manual:** comparar lado a lado com o site; testar no celular.
 
-### Etapa 3 — Geométrico: caderneta e irradiação
+### Etapa 3 — Geométrico: caderneta e irradiação — *concluída em 25/11/2026 (27 testes), aguardando teste manual*
 - **Objetivo:** tabela editável (estação, ponto, ré, vante, intermediária, FS/FI opcionais, DH, observação), cálculo de APV e cotas, verificação aritmética, alertas de campo, σ (F.1), perfil SVG.
 - **Aceite:** G01 confere (9,139 ± 3,8 mm); Exemplo I da AA reproduz a Tabela 1; DH por estadimetria quando houver três fios; colunas de diferença ré−vante e distância acumulada; navegação só por teclado (Enter/Tab) funciona.
 - **Teste manual:** digitar a caderneta da NBR F.2 e a do Exemplo I.
+- **Feito:** núcleo `geometrico.js` (já encadeia estações com vante de mudança, base da etapa 4), σ pela F.1 nas vantes e F.1 sem simplificação nas intermediárias (D27), σ por km ao lado (D25), alertas D26 lidos de `data/norma_nbr13133_2021.json`, rascunho no navegador, exemplo F.2 em `data/exemplos/`. Falta o "Exemplo I / Tabela 1" da AA (dados não estão no repositório; o Exemplo I documentado é o de estatística).
 
-### Etapa 4 — Geométrico: transporte, circuito e linha
+### Etapa 4 — Geométrico: transporte, circuito e linha — *concluída em 25/11/2026 (38 testes), aguardando teste manual*
 - **Objetivo:** seções/PS, nivelamento e contranivelamento, circuito, linha entre RN; tolerância pela classe (Tabela 5); distribuição proporcional à distância (padrão) e por estação (opção didática); altura corrigida e σ (doc 4, itens 4.3.4 e 4.3.6).
 - **Aceite:** G02–G08 conferem (alturas, erro, K, correções, distâncias percorridas no nivelamento e no contranivelamento — 383,132 / 368,548 m no G04 e 453,132 / 488,596 m no G05) e a tabela de tolerâncias 2021 do doc 7 é reproduzida; relatório de seção e de linha.
 - **Teste manual:** resolver Exercícios I–IV da AA na tela e comparar com as respostas.
+- **Feito:** caderneta contínua por modo (transporte = ida até a RN de chegada e volta à partida; K = ida); erro, K, T = t√K nas três classes da Tabela 5 com "Atende/Não atende" em texto; distribuição proporcional (padrão, D23) e por estação (didática, com opção de arredondar C — errata E2); σ rigoroso (4.3.6) com Anexo L e σ por km ao lado (D24, D25); RN de chegada do transporte também pela média ida/volta (4.3.6 c); |e|/σ esperado (4.3.3). G02 e G03 não têm dados no repositório (só tolerâncias testadas). Seções com PS: uma caderneta por seção.
 
 ### Etapa 5 — Trigonométrico
 - **Objetivo:** irradiação com Di ou DH; PD/PI; c+r automático por limiar; recíprocas; poligonal altimétrica com fechamento II N; σ (F.3 e forma geral).

@@ -15,15 +15,98 @@
   <link rel="stylesheet" href="assets/css/componentes.css">
   <link rel="stylesheet" href="assets/css/impressao.css">
   <script type="module" src="src/ui/layout.js"></script>
+  <script type="module" src="src/ui/paginas/geometrico.js"></script>
 </head>
 <body data-pagina="geometrico">
   <div id="cabecalho"></div>
-  <main id="conteudo" class="em-construcao">
+  <main id="conteudo" class="pagina-calculo">
     <div class="container">
       <span class="rotulo">Nivelamento Geométrico</span>
-      <h1>Nivelamento <span class="destaque">geométrico.</span></h1>
-      <p class="aviso">A caderneta de nivelamento geométrico (irradiação, transporte de RN, circuito fechado e linha entre duas RN) está em desenvolvimento — etapas 3 e 4 do plano.</p>
-      <p style="margin-top:28px"><a class="botao botao-secundario" href="index.html">Voltar ao início</a></p>
+      <h1>Caderneta de <span class="destaque">nivelamento geométrico.</span></h1>
+      <p class="lead-calc">Digite as leituras como na caderneta de papel. As alturas, o APV, as distâncias e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
+
+      <div class="abas-modo" role="tablist" aria-label="Modo de cálculo">
+        <button type="button" class="aba" role="tab" data-modo="irradiacao">Irradiação</button>
+        <button type="button" class="aba" role="tab" data-modo="transporte">Transporte de RN</button>
+        <button type="button" class="aba" role="tab" data-modo="circuito">Circuito fechado</button>
+        <button type="button" class="aba" role="tab" data-modo="linha">Linha entre duas RN</button>
+      </div>
+      <p class="nota" id="descricao-modo"></p>
+
+      <section class="bloco" aria-labelledby="t-cab">
+        <h2 id="t-cab"><span class="numero">1</span> Dados do levantamento</h2>
+        <form id="form-cabecalho" class="grade-campos">
+          <label>Ponto de referência <input id="ref-ponto" autocomplete="off" placeholder="ex.: RN1"></label>
+          <label>Altura da referência (m) <input id="ref-h" inputmode="decimal" autocomplete="off" placeholder="ex.: 9,315"></label>
+          <label>σ da referência (mm) <input id="ref-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label>Tipo de altura
+            <select id="tipo-altura">
+              <option value="cota">Cota (referência arbitrária)</option>
+              <option value="altitude_normal">Altitude normal (SGB)</option>
+            </select>
+          </label>
+          <label class="so-fechamento" data-modos="transporte linha">RN de chegada <input id="cheg-ponto" autocomplete="off" placeholder="ex.: RN2"></label>
+          <label class="so-fechamento" data-modos="linha">Altura da RN de chegada (m) <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
+          <label class="so-fechamento" data-modos="linha">σ da RN de chegada (mm) <input id="cheg-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="so-fechamento largo" data-modos="transporte circuito linha">Classe (NBR 13133:2021, Tabela 5) <select id="classe"></select></label>
+          <label class="so-fechamento largo" data-modos="transporte circuito linha">Distribuição do erro
+            <select id="distribuicao">
+              <option value="distancia">Proporcional à distância (NBR 13133:2021, 5.5.2.12)</option>
+              <option value="estacao">Por estação (didático, apostila — não previsto na NBR 2021)</option>
+            </select>
+          </label>
+          <label class="so-fechamento marcar largo" data-modos="transporte circuito linha" id="rot-arredondar"><input type="checkbox" id="arredondar-c"> Arredondar C a 0,1 mm como a apostila (só para conferência)</label>
+          <label class="largo">Nível <select id="instrumento"></select></label>
+          <label>σ da leitura (mm) <input id="sigma-leitura" inputmode="decimal" autocomplete="off"></label>
+          <label>a uma distância de (m) <input id="dist-ref" inputmode="decimal" autocomplete="off"></label>
+          <label>σ por km (mm/km) <input id="sigma-km" inputmode="decimal" autocomplete="off"></label>
+          <details class="largo limites">
+            <summary>Limites dos alertas (do programa, editáveis)</summary>
+            <div class="grade-campos">
+              <label>Três fios: |FM − (FS+FI)/2| até (mm) <input id="tol-3fios" inputmode="decimal" autocomplete="off"></label>
+              <label>Diferença ré − vante até (m) <input id="dif-rv" inputmode="decimal" autocomplete="off"></label>
+            </div>
+            <p class="nota">Fixos pela NBR 13133:2021: visada máxima de 80 m (Tabela 5) e leitura a pelo menos 0,30 m (5.5.2.8).</p>
+          </details>
+        </form>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-cad">
+        <h2 id="t-cad"><span class="numero">2</span> Caderneta</h2>
+        <p class="nota">Cada leitura de <strong>ré</strong> abre uma estação. Na mesma estação, use <strong>vante</strong> para a mudança (ou o ponto final) e <strong>intermediária</strong> para os pontos irradiados. DH vazia com FS e FI preenchidos é calculada por estadimetria (DH = 100 × (FS − FI), em itálico). <kbd>Enter</kbd> ou <kbd>Tab</kbd> avançam, <kbd>↑</kbd> <kbd>↓</kbd> mudam de linha; é possível colar um bloco copiado da planilha.</p>
+        <div class="barra-acoes nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
+          <button type="button" class="botao botao-secundario" id="bt-remover">− Remover linha</button>
+          <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo</button>
+          <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
+          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+        </div>
+        <div class="rolagem-tabela" id="caderneta"></div>
+        <p class="nota">O rascunho fica salvo só neste navegador.</p>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-res" aria-live="polite">
+        <h2 id="t-res"><span class="numero">3</span> Resultados</h2>
+        <div id="mensagens" class="mensagens"></div>
+        <div id="bloco-fechamento" class="so-fechamento" data-modos="transporte circuito linha">
+          <div class="grade-resumo grade-fechamento">
+            <div class="cartao-resumo"><h3>Fechamento</h3><div id="fechamento"></div></div>
+            <div class="cartao-resumo"><h3>Tolerância — NBR 13133:2021, Tabela 5</h3><div id="tolerancias"></div></div>
+          </div>
+          <div class="cartao-resumo cartao-solto so-fechamento" data-modos="transporte"><h3>Nivelamento e contranivelamento</h3><div id="transporte"></div></div>
+        </div>
+        <div class="grade-resumo">
+          <div class="cartao-resumo"><h3>Verificação aritmética</h3><div id="verificacao"></div></div>
+          <div class="cartao-resumo"><h3>Distâncias</h3><div id="distancias"></div></div>
+          <div class="cartao-resumo"><h3>Parâmetros do cálculo</h3><div id="parametros"></div></div>
+        </div>
+        <h3 class="subtitulo">Alturas calculadas</h3>
+        <div class="rolagem-tabela" id="tabela-pontos"></div>
+        <h3 class="subtitulo">Estações</h3>
+        <div class="rolagem-tabela" id="tabela-estacoes"></div>
+        <h3 class="subtitulo">Perfil</h3>
+        <div id="perfil" class="caixa-perfil"></div>
+      </section>
     </div>
   </main>
   <div id="rodape"></div>

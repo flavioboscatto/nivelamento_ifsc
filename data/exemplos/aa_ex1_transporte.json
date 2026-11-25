@@ -1,0 +1,114 @@
+{
+  "titulo": "Altimetria Aplicada, Exercício I (Tab. 7) — transporte de RN; nomes das mudanças A1…B3 atribuídos pelo programa",
+  "cabecalho": {
+    "pontoRef": "RN1",
+    "H_ref": "9,315",
+    "sigmaRef_mm": "0",
+    "tipoAltura": "cota",
+    "instrumento": "sprinter150_eletronica",
+    "pontoChegada": "RN2",
+    "distribuicao": "distancia",
+    "classe": "IN-3"
+  },
+  "linhas": [
+    {
+      "estacao": "1",
+      "ponto": "RN1",
+      "re": "1,875",
+      "dh": "40,325"
+    },
+    {
+      "ponto": "A1",
+      "vante": "1,503",
+      "dh": "38,093"
+    },
+    {
+      "estacao": "2",
+      "ponto": "A1",
+      "re": "0,889",
+      "dh": "43,178"
+    },
+    {
+      "ponto": "A2",
+      "vante": "2,116",
+      "dh": "49,543"
+    },
+    {
+      "estacao": "3",
+      "ponto": "A2",
+      "re": "1,009",
+      "dh": "52,972"
+    },
+    {
+      "ponto": "A3",
+      "vante": "0,784",
+      "dh": "58,243"
+    },
+    {
+      "estacao": "4",
+      "ponto": "A3",
+      "re": "1,234",
+      "dh": "29,548"
+    },
+    {
+      "ponto": "A4",
+      "vante": "1,604",
+      "dh": "30,478"
+    },
+    {
+      "estacao": "5",
+      "ponto": "A4",
+      "re": "1,198",
+      "dh": "22,765"
+    },
+    {
+      "ponto": "RN2",
+      "vante": "0,857",
+      "dh": "17,987"
+    },
+    {
+      "estacao": "6",
+      "ponto": "RN2",
+      "re": "0,987",
+      "dh": "25,767"
+    },
+    {
+      "ponto": "B1",
+      "vante": "1,479",
+      "dh": "31,005"
+    },
+    {
+      "estacao": "7",
+      "ponto": "B1",
+      "re": "0,678",
+      "dh": "45,528"
+    },
+    {
+      "ponto": "B2",
+      "vante": "0,756",
+      "dh": "41,806"
+    },
+    {
+      "estacao": "8",
+      "ponto": "B2",
+      "re": "1,542",
+      "dh": "59,289"
+    },
+    {
+      "ponto": "B3",
+      "vante": "0,975",
+      "dh": "63,543"
+    },
+    {
+      "estacao": "9",
+      "ponto": "B3",
+      "re": "1,532",
+      "dh": "53,096"
+    },
+    {
+      "ponto": "RN1",
+      "vante": "0,876",
+      "dh": "48,514"
+    }
+  ]
+}
