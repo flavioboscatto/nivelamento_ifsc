@@ -239,3 +239,19 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 .lista-norma li { margin: 8px 0; }
 .rolagem-tabela { position: relative; }
 .sr { left: 0; top: 0; }
+
+/* ---------- Estatística de séries (etapa 7) ---------- */
+.barra-projeto-simples { grid-template-columns: minmax(0, 1fr) auto; }
+.campo-serie textarea { font: inherit; font-size: 16px; font-variant-numeric: tabular-nums; padding: 9px 10px; border: 1px solid #B9C3CA; border-radius: var(--raio); resize: vertical; min-width: 0; }
+.resultado-final { font-size: clamp(22px, 3vw, 30px); font-weight: 800; color: var(--texto-titulo); margin: 4px 0 20px; font-variant-numeric: tabular-nums; }
+.resultado-final small { display: block; font-size: 15px; font-weight: 500; color: var(--texto); }
+.tabela-resultado input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--verde-escuro); }
+.grafico-serie .media { stroke: var(--verde-escuro); stroke-width: 2; }
+.grafico-serie .media-todas { stroke: var(--texto); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.grafico-serie .limite { stroke: var(--alerta); stroke-width: 1; stroke-dasharray: 2 4; }
+.grafico-serie .obs circle { fill: var(--verde-escuro); stroke: #fff; stroke-width: 1.5; }
+.grafico-serie .obs.fora circle { fill: #fff; stroke: var(--erro); stroke-width: 2.5; }
+.grafico-serie .obs.fora text { fill: var(--erro); font-weight: 700; }
+.grafico-serie .legenda { font-size: 13px; fill: var(--texto); }
+@media (max-width: 760px) { .barra-projeto-simples { grid-template-columns: minmax(0, 1fr); } }
+.link-apoio { margin-top: 22px; font-size: 16px; }

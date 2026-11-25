@@ -59,3 +59,38 @@ export function resumoSerie(obs) {
     residuos: residuos(obs),
   };
 }
+
+/**
+ * Lê uma série digitada ou colada: valores separados por quebra de linha, ";", tabulação ou espaço
+ * (a vírgula é o separador decimal). Retorna { valores, invalidos: [{posicao, texto}] }.
+ */
+export function lerSerie(texto, parse) {
+  const partes = String(texto ?? '').split(/[\s;]+/).filter((p) => p !== '');
+  const valores = [], invalidos = [];
+  partes.forEach((p, k) => {
+    const v = parse(p);
+    if (Number.isFinite(v)) valores.push(v); else invalidos.push({ posicao: k + 1, texto: p });
+  });
+  return { valores, invalidos };
+}
+
+/**
+ * Análise completa de uma série (AA Exemplo I; doc 2, 2.5):
+ *  - resumo com todas as observações;
+ *  - detecção de atípicas (removendo uma de cada vez — ver detectarAtipicas);
+ *  - resumo final sem as atípicas (se `removerAtipicas`) e sem as excluídas à mão.
+ * @param {number[]} obs
+ * @param {{fator?, limiteFixo?, removerAtipicas?: boolean, excluidas?: number[]}} op  índices base 0
+ */
+export function analisarSerie(obs, { fator = 3, limiteFixo = null, removerAtipicas = true, excluidas = [] } = {}) {
+  const todas = resumoSerie(obs);
+  const det = detectarAtipicas(obs, { fator, limiteFixo });
+  const atipicas = new Set(det.removidas.map((r) => r.indice));
+  const manuais = new Set(excluidas);
+  const usadas = obs.map((_, i) => !manuais.has(i) && !(removerAtipicas && atipicas.has(i)));
+  const final = resumoSerie(obs.filter((_, i) => usadas[i]));
+  return {
+    todas, final, atipicas: det.removidas, usadas,
+    residuosFinais: obs.map((x) => final.media - x),
+  };
+}

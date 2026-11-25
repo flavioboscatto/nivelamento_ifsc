@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Estatística de Séries — Nivelamento IFSC</title>
+  <meta name="description" content="Calculadora de nivelamento geométrico e trigonométrico do Curso Técnico em Agrimensura do IFSC, conforme a ABNT NBR 13133:2021. Cálculo feito no navegador.">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/componentes.css">
+  <link rel="stylesheet" href="assets/css/impressao.css">
+  <script type="module" src="src/ui/layout.js"></script>
+  <script type="module" src="src/ui/paginas/apoio.js"></script>
+</head>
+<body data-pagina="apoio">
+  <div id="cabecalho"></div>
+  <main id="conteudo" class="pagina-calculo">
+    <div class="container">
+      <span class="rotulo">Recursos de apoio</span>
+      <h1>Estatística de <span class="destaque">séries.</span></h1>
+      <p class="lead-calc">Observações repetidas da mesma grandeza (por exemplo, dez medidas do mesmo desnível): média, desvio-padrão, desvio-padrão da média, resíduos e detecção de observações atípicas.</p>
+
+      <section class="barra-projeto barra-projeto-simples" aria-label="Projeto">
+        <label class="campo-projeto">Projeto <input id="nome-projeto" autocomplete="off" placeholder="ex.: Aula 2 — série do desnível RN1–RN2"></label>
+        <div class="acoes-projeto nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-abrir">Abrir projeto</button>
+          <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
+          <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
+        </div>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-dados">
+        <h2 id="t-dados"><span class="numero">1</span> Observações</h2>
+        <form id="form-serie" class="grade-campos">
+          <label class="largo">Grandeza medida <input id="grandeza" autocomplete="off" placeholder="ex.: desnível RN1–RN2"></label>
+          <label>Unidade <input id="unidade" autocomplete="off" value="m"></label>
+          <label>Critério para atípicas
+            <select id="criterio">
+              <option value="3s">3 s, calculado sem a observação testada</option>
+              <option value="fixo">Limite fixo (ex.: 3 × precisão nominal, NBR 5.2.11)</option>
+            </select>
+          </label>
+          <label id="rot-limite" hidden>Limite fixo (mm) <input id="limite" inputmode="decimal" autocomplete="off" placeholder="ex.: 10"></label>
+          <label class="marcar largo"><input type="checkbox" id="remover" checked> Retirar as atípicas do resultado final</label>
+          <label class="largo campo-serie">Valores (um por linha, ou separados por ";" ou espaço; vírgula decimal)
+            <textarea id="valores" rows="8" spellcheck="false" placeholder="12,792&#10;12,785&#10;12,783"></textarea>
+          </label>
+        </form>
+        <div class="barra-acoes nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo AA Ex. I</button>
+          <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
+          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+        </div>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-res" aria-live="polite">
+        <h2 id="t-res"><span class="numero">2</span> Resultados</h2>
+        <div id="mensagens" class="mensagens"></div>
+        <p id="resultado-final" class="resultado-final"></p>
+        <div class="grade-resumo grade-fechamento">
+          <div class="cartao-resumo"><h3>Com todas as observações</h3><div id="resumo-todas"></div></div>
+          <div class="cartao-resumo"><h3>Resultado final</h3><div id="resumo-final"></div></div>
+        </div>
+        <h3 class="subtitulo">Observações e resíduos</h3>
+        <div class="rolagem-tabela" id="tabela-obs"></div>
+        <h3 class="subtitulo">Gráfico</h3>
+        <div id="grafico" class="caixa-perfil"></div>
+        <p class="nota">Fórmulas: média x̄ = Σx/n; resíduo v = x̄ − x; s = √(Σv²/(n − 1)); desvio-padrão da média s<sub>x̄</sub> = s/√n. Atípica: |x − x̄| maior que 3 s (ou o limite fixo), com x̄ e s calculados sem a observação testada, uma de cada vez.</p>
+      </section>
+    </div>
+  </main>
+  <div id="rodape"></div>
+</body>
+</html>

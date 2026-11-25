@@ -171,8 +171,9 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Aceite:** E01 = 9,395 m; Q01 conferido pelo professor.
 - **Feito:** modo Taqueometria em `trigonometrico.html`: estação conhecida com i e azimute da direção Hz = 0; FS/FM/FI, Z, Hz; DH, DN, H, Az, X, Y; σ pela forma do doc 4.5 (σleit = 1 mm, editável); alertas de três fios e visada > 80 m (III N). E01 confere; Q01 reproduz os valores do doc 7 (pendente a conferência do professor).
 
-### Etapa 7 — Estatística de séries
+### Etapa 7 — Estatística de séries — *concluída em 25/11/2026 (60 testes), aguardando teste manual*
 - **Aceite:** S01/S02; gráfico igual às Figuras 7 e 8 da AA; detecção do atípico (obs. 7).
+- **Feito:** `apoio.html` com resultado x̄ ± s_x̄ (12,791 ± 0,002 m no Exemplo I), resumo com todas e final, resíduos, atípica pela obs. 7, exclusão manual, gráfico (observações, média final, média com todas, ±3 s) e projeto `.niv`. As Figuras 7 e 8 não estão no repositório; comparar o gráfico com a apostila no teste manual.
 
 ### Etapa 8 — Ferramentas auxiliares
 - Conversor angular, Anexo C (A01), c+r (A04), GNSS → altitude normal (A02, A03).

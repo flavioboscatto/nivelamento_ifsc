@@ -37,7 +37,7 @@ export function lerProjeto(texto, { modulo } = {}) {
   if (!p || p.formato !== FORMATO) return { ok: false, erro: 'O arquivo não é um projeto da Calculadora de Nivelamento IFSC.' };
   if (!(p.versao >= 1) || p.versao > VERSAO) return { ok: false, erro: `Projeto da versão ${p.versao}; esta página lê até a versão ${VERSAO}. Atualize a página.` };
   if (modulo && p.modulo !== modulo) {
-    const nomes = { geometrico: 'nivelamento geométrico', trigonometrico: 'nivelamento trigonométrico' };
+    const nomes = { geometrico: 'nivelamento geométrico', trigonometrico: 'nivelamento trigonométrico', apoio: 'estatística de séries' };
     return { ok: false, erro: `Este projeto é de ${nomes[p.modulo] || p.modulo}. Abra-o na página correspondente.` };
   }
   if (!Array.isArray(p.linhas)) return { ok: false, erro: 'O projeto não tem a caderneta (lista de linhas).' };

@@ -48,6 +48,7 @@ function rodape() {
           <h2>Links</h2>
           <ul>
             <li><a href="${SITE_CURSO}">Site do curso</a></li>
+            <li><a href="apoio.html">Estatística de séries</a></li>
             <li><a href="sobre.html">Sobre a norma e as fórmulas</a></li>
             <li><a href="${REPOSITORIO}">Código-fonte no GitHub</a></li>
           </ul>

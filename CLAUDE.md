@@ -22,7 +22,8 @@ Leia antes de qualquer tarefa:
 - **Etapa 5 concluída (aguardando teste manual do professor):** `src/core/trigonometrico.js` (irradiação com Di ou DH, PD/PI, c+r por limiar, σ pela forma geral = F.3, poligonal II N com fechamento, visadas recíprocas), `trigonometrico.html` + `src/ui/paginas/trigonometrico.js`; 50 testes (T01, T03, A01, A04). ET pelas classes da Tabela 2 até chegarem os modelos FOIF/Ruide.
 - Pendente da etapa 5: T02 (Anexo H) sem dados no projeto; T03 3ª visada difere 0,8 mm por arredondamento de c+r na norma (errata E11).
 - **Etapa 6 concluída (aguardando teste manual):** `src/core/taqueometria.js` (estadimetria, DN, H, X, Y, σ do doc 4.5), modo Taqueometria na página trigonométrica com exemplo AA Ex. V; 56 testes (E01, Q01). **Q01 confere com o doc 7, mas os valores esperados ainda precisam da conferência do professor** (apostila sem resposta).
-- **Próxima etapa:** Etapa 7 — estatística de séries.
+- **Etapa 7 concluída (aguardando teste manual):** `apoio.html` + `src/ui/paginas/apoio.js` (série de observações, atípicas por 3 s sem a observação ou limite fixo, exclusão manual, gráfico com média e ±3 s, projeto .niv); `analisarSerie` e `lerSerie` em `estatistica.js`; links no rodapé e na página inicial; 60 testes (S01, S02). Figuras 7 e 8 da AA não estão no projeto: o gráfico segue o doc 2.5 (observações + linha da média).
+- **Próxima etapa:** Etapa 8 — ferramentas auxiliares (conversor angular, Anexo C, c+r, GNSS → altitude normal).
 - Regra geral: **seguir sempre a NBR 13133:2021** (D23–D27).
 - Aguardando: arquivos de amostra (etapas 9–10); modelos/fichas técnicas dos equipamentos; conferência do caso Q01.
 
