@@ -1,7 +1,7 @@
 // sw.js — funcionamento sem internet (uso em campo).
 // Estratégia: rede primeiro (sempre a versão mais nova quando há internet) e, sem internet,
 // a cópia guardada. Ao publicar mudanças, aumentar VERSAO para renovar a cópia.
-const VERSAO = 'nivelamento-ifsc-v1';
+const VERSAO = 'nivelamento-ifsc-v2';
 
 const ARQUIVOS = [
   './', 'index.html', 'geometrico.html', 'trigonometrico.html', 'apoio.html', 'sobre.html', '404.html',

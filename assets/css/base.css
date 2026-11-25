@@ -81,7 +81,7 @@ p { margin: 0 0 1em; }
 /* ---------- Rodapé ---------- */
 .rodape { background: var(--azul-noite-2); color: var(--texto-sobre-escuro-2); font-size: 15px; margin-top: 0; }
 .rodape .container { padding-top: 56px; padding-bottom: 32px; }
-.rodape-grade { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 40px; }
+.rodape-grade { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; }
 .rodape h2 { color: #fff; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
 .rodape a { color: var(--texto-sobre-escuro-2); text-decoration: none; }
 .rodape a:hover { color: #fff; text-decoration: underline; }

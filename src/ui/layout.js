@@ -46,18 +46,10 @@ function rodape() {
         <div>
           <h2>Links</h2>
           <ul>
-            <li><a href="${SITE_CURSO}">Site do curso</a></li>
+            <li><a href="${SITE_CURSO}" target="_blank" rel="noopener">Site do curso</a></li>
             <li><a href="apoio.html">Estatística de séries</a></li>
             <li><a href="sobre.html">Sobre a norma e as fórmulas</a></li>
             <li><a href="${REPOSITORIO}">Código-fonte no GitHub</a></li>
-          </ul>
-        </div>
-        <div>
-          <h2>Contato</h2>
-          <ul>
-            <li><a href="tel:+554832116061">(48) 3211-6061</a></li>
-            <li><a href="mailto:agrimensura.tec.fln@ifsc.edu.br">agrimensura.tec.fln@ifsc.edu.br</a></li>
-            <li>Av. Mauro Ramos, 950, Centro — Florianópolis/SC</li>
           </ul>
         </div>
       </div>
