@@ -97,7 +97,7 @@ export function calcularCaderneta(linhas, op = {}) {
     const L = {
       indice: i, linha: i + 1, ponto, obs: vazio(bruta.obs) ? '' : String(bruta.obs).trim(),
       tipo: null, leitura: NaN, dh: NaN, dhOrigem: null, dhEstadimetria: NaN, fmCalc: NaN, dif3fios: NaN,
-      apv: NaN, H: NaN, sigma: NaN, sigmaKm: NaN, sigmaForma: null, distAcum: NaN, difReVante: NaN,
+      apv: NaN, H: NaN, desnivel: NaN, sigma: NaN, sigmaKm: NaN, sigmaForma: null, distAcum: NaN, difReVante: NaN,
       estacao: null, nEstacao: null, erros: [], alertas: [],
     };
     const c = Object.fromEntries(campos.map((k) => [k, lerCampo(bruta[k])]));
@@ -231,6 +231,7 @@ export function calcularCaderneta(linhas, op = {}) {
     if (Number.isFinite(est.apv)) {
       L.apv = est.apv;
       L.H = est.apv - L.leitura;
+      L.desnivel = L.H - est.Hre; // desnível em relação ao ponto de ré da estação (= L ré − L)
     }
     const temDh = Number.isFinite(est.dhRe) && Number.isFinite(L.dh);
     if (Number.isFinite(L.H)) {
@@ -242,7 +243,7 @@ export function calcularCaderneta(linhas, op = {}) {
         L.sigmaKm = sigmaPorKm(est.sigmaKmRe, sigmaKm_m, est.dhRe, L.dh);
       }
       if (temDh && Number.isFinite(est.acumRe)) L.distAcum = est.acumRe + est.dhRe + L.dh;
-      if (!temDh) alerta(`sem a distância horizontal ${Number.isFinite(est.dhRe) ? 'deste ponto' : 'da ré desta estação'} não é possível calcular o desvio-padrão. Digite DH ou os três fios.`);
+      if (!temDh) alerta(`sem DH ${Number.isFinite(est.dhRe) ? 'do ponto' : 'da ré'}, o desvio-padrão não é calculado (digite DH ou FS e FI).`);
     }
 
     if (L.tipo === 'vante') {
@@ -274,10 +275,10 @@ export function calcularCaderneta(linhas, op = {}) {
   const temIrradiados = estacoes.some((e) => e.irradiados > 0);
 
   if (comVante.length >= 2 && comVante.length % 2 === 1) {
-    alertas.push(`Número de lances ímpar (${comVante.length}). A NBR 13133:2021, 5.5.2.3, recomenda número par de lances (mesma mira na partida e na chegada).`);
+    alertas.push(`Número de lances ímpar (${comVante.length}): a NBR 13133:2021 (5.5.2.3) recomenda número par.`);
   }
   if (temIrradiados) {
-    alertas.push(`Pontos irradiados não têm verificação de fechamento. Recomenda-se visar também um ponto de ${nomeAltura} conhecida como controle.`);
+    alertas.push(`Pontos irradiados não têm fechamento; vise também um ponto de ${nomeAltura} conhecida.`);
   }
 
   // Verificação aritmética: Σ ré − Σ vante = H final − H inicial (doc 2, 2.2.3)
@@ -302,7 +303,7 @@ export function calcularCaderneta(linhas, op = {}) {
 
   const pontos = saida
     .filter((l) => l.tipo && l.erros.length === 0 && Number.isFinite(l.H) && l.ponto)
-    .map((l) => ({ ponto: l.ponto, tipo: l.tipo, estacao: l.estacao, H: l.H, sigma: l.sigma, sigmaKm: l.sigmaKm, distAcum: l.distAcum }));
+    .map((l) => ({ ponto: l.ponto, tipo: l.tipo, estacao: l.estacao, desnivel: l.desnivel, H: l.H, sigma: l.sigma, sigmaKm: l.sigmaKm, distAcum: l.distAcum }));
 
   return {
     linhas: saida, estacoes, pontos, verificacao,

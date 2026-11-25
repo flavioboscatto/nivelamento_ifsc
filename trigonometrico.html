@@ -23,7 +23,6 @@
     <div class="container">
       <span class="rotulo">Nivelamento Trigonométrico</span>
       <h1>Caderneta de <span class="destaque">nivelamento trigonométrico.</span></h1>
-      <p class="lead-calc">Digite o ângulo zenital, a distância e as alturas do instrumento e do sinal. As <span data-altura-min>cotas</span>, a curvatura e refração e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
 
       <section class="barra-projeto" aria-label="Projeto">
         <label class="campo-projeto">Projeto <input id="nome-projeto" autocomplete="off" placeholder="ex.: Aula 5 — poligonal do pátio"></label>
@@ -67,45 +66,56 @@
           <label data-modos="taqueometria">X da estação (m) <input id="ref-x" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
           <label data-modos="taqueometria">Y da estação (m) <input id="ref-y" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
           <label data-modos="taqueometria">Azimute da direção Hz = 0 <input id="az-ref" autocomplete="off" placeholder="GG,MMSS"></label>
-          <label data-modos="taqueometria">σ da leitura na mira (mm) <input id="sigma-leit" inputmode="decimal" autocomplete="off"></label>
           <label data-modos="poligonal">Ponto de chegada <input id="cheg-ponto" autocomplete="off" placeholder="vazio = fecha na referência"></label>
           <label data-modos="poligonal"><span><span data-altura>Cota</span> do ponto de chegada (m)</span> <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
           <label data-modos="poligonal">σ do ponto de chegada (mm) <input id="cheg-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
           <label class="largo" data-modos="poligonal">Classe (NBR 13133:2021, Tabela 6) <select id="classe"></select></label>
           <label class="largo">Estação total / teodolito <select id="instrumento"></select></label>
-          <label>σ do ângulo zenital (") <input id="sigma-z" inputmode="decimal" autocomplete="off"></label>
-          <label data-modos="irradiacao poligonal reciprocas">σ da distância: a (mm) <input id="dist-a" inputmode="decimal" autocomplete="off"></label>
-          <label data-modos="irradiacao poligonal reciprocas">σ da distância: b (ppm) <input id="dist-b" inputmode="decimal" autocomplete="off"></label>
-          <label>σ de i e de s (mm) <input id="sigma-is" inputmode="decimal" autocomplete="off"></label>
-          <label data-modos="irradiacao poligonal reciprocas">Curvatura e refração
-            <select id="aplicar-cr">
-              <option value="auto">Acima do limite (NBR 5.5.3.1)</option>
-              <option value="sempre">Sempre</option>
-              <option value="nunca">Nunca</option>
-            </select>
-          </label>
-          <label data-modos="irradiacao poligonal reciprocas">Limite para c+r (m) <input id="limiar-cr" inputmode="decimal" autocomplete="off"></label>
-          <label data-modos="irradiacao poligonal reciprocas">Raio da Terra R (m) <input id="raio" inputmode="decimal" autocomplete="off"></label>
-          <label data-modos="irradiacao poligonal reciprocas">Coeficiente de refração k <input id="coef-k" inputmode="decimal" autocomplete="off"></label>
+          <details class="largo limites">
+            <summary>Precisões e curvatura e refração</summary>
+            <div class="grade-campos">
+              <label data-modos="taqueometria">σ da leitura na mira (mm) <input id="sigma-leit" inputmode="decimal" autocomplete="off"></label>
+              <label>σ do ângulo zenital (") <input id="sigma-z" inputmode="decimal" autocomplete="off"></label>
+              <label data-modos="irradiacao poligonal reciprocas">σ da distância: a (mm) <input id="dist-a" inputmode="decimal" autocomplete="off"></label>
+              <label data-modos="irradiacao poligonal reciprocas">σ da distância: b (ppm) <input id="dist-b" inputmode="decimal" autocomplete="off"></label>
+              <label>σ de i e de s (mm) <input id="sigma-is" inputmode="decimal" autocomplete="off"></label>
+              <label data-modos="irradiacao poligonal reciprocas">Curvatura e refração
+                <select id="aplicar-cr">
+                  <option value="auto">Acima do limite (NBR 5.5.3.1)</option>
+                  <option value="sempre">Sempre</option>
+                  <option value="nunca">Nunca</option>
+                </select>
+              </label>
+              <label data-modos="irradiacao poligonal reciprocas">Limite para c+r (m) <input id="limiar-cr" inputmode="decimal" autocomplete="off"></label>
+              <label data-modos="irradiacao poligonal reciprocas">Raio da Terra R (m) <input id="raio" inputmode="decimal" autocomplete="off"></label>
+              <label data-modos="irradiacao poligonal reciprocas">Coeficiente de refração k <input id="coef-k" inputmode="decimal" autocomplete="off"></label>
+            </div>
+          </details>
         </form>
       </section>
 
       <section class="bloco" aria-labelledby="t-cad">
         <h2 id="t-cad"><span class="numero">2</span> Caderneta</h2>
-        <p class="nota" id="ajuda-caderneta"></p>
+        <p class="ajuda-curta" id="ajuda-caderneta"></p>
         <div class="barra-acoes nao-imprimir">
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
           <button type="button" class="botao botao-secundario" id="bt-exemplo" data-modos="taqueometria">Exemplo AA Ex. V</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
-          <button type="button" class="botao botao-secundario" id="bt-csv-caderneta">CSV da caderneta</button>
-          <button type="button" class="botao botao-secundario" id="bt-csv-resultados">CSV dos resultados</button>
-          <button type="button" class="botao botao-secundario" id="bt-previa">Prévia do relatório</button>
-          <button type="button" class="botao botao-secundario" id="bt-xlsx">Planilha (.xlsx)</button>
-          <button type="button" class="botao botao-secundario" id="bt-docx">Relatório Word (.docx)</button>
-          <button type="button" class="botao botao-primario" id="bt-relatorio">Relatório / PDF</button>
+          <details class="menu-exportar">
+            <summary class="botao botao-primario">Exportar</summary>
+            <div class="opcoes">
+              <button type="button" id="bt-relatorio">Relatório PDF / imprimir</button>
+              <button type="button" id="bt-docx">Relatório Word (.docx)</button>
+              <button type="button" id="bt-previa">Prévia do relatório</button>
+              <hr>
+              <button type="button" id="bt-xlsx">Planilha (.xlsx)</button>
+              <button type="button" id="bt-csv-caderneta">CSV da caderneta</button>
+              <button type="button" id="bt-csv-resultados">CSV dos resultados</button>
+            </div>
+          </details>
         </div>
         <div class="rolagem-tabela" id="caderneta"></div>
-        <p class="nota">Ângulos sempre sexagesimais, no formato <strong>GG,MMSS</strong> (como no equipamento): 91,1940 = 91°19'40"; 91,19405 = 91°19'40,5". Também aceita 91°19'40" ou 91 19 40. Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
+        <p class="ajuda-curta">Ângulos em <strong>GG,MMSS</strong> (91,1940 = 91°19'40"). Rascunho salvo neste navegador.</p>
       </section>
 
       <section class="bloco" aria-labelledby="t-res" aria-live="polite">
@@ -117,7 +127,7 @@
             <div class="cartao-resumo"><h3>Tolerância — NBR 13133:2021, Tabela 6</h3><div id="tolerancias"></div></div>
           </div>
         </div>
-        <div class="grade-resumo grade-fechamento">
+        <div class="grade-resumo grade-fechamento so-relatorio">
           <div class="cartao-resumo"><h3>Parâmetros do cálculo</h3><div id="parametros"></div></div>
           <div class="cartao-resumo"><h3>Distâncias</h3><div id="distancias"></div></div>
         </div>

@@ -221,6 +221,12 @@ export function iniciarRelatorio({ pagina, contexto }) {
       nomeArquivo(ctx.projeto, ctx.modo).replace(/\.niv$/, '_relatorio.docx'), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
   }
 
+  // Menu "Exportar": fecha ao escolher uma opção ou ao clicar fora
+  document.querySelectorAll('.menu-exportar').forEach((menu) => {
+    menu.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { menu.open = false; }));
+    document.addEventListener('click', (ev) => { if (menu.open && !menu.contains(ev.target)) menu.open = false; });
+  });
+
   window.addEventListener('beforeprint', montar);
   $('bt-xlsx')?.addEventListener('click', xlsx);
   $('bt-docx')?.addEventListener('click', () => docx().catch((e) => alert(`Não foi possível gerar o relatório .docx: ${e.message}`)));

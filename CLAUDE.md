@@ -59,6 +59,8 @@ Leia antes de qualquer tarefa:
 - Pontos têm três status: **Ré**, **Vante** e **Irradiado** (abreviado **Irad.**). Não usar "intermediária" na interface.
 - O usuário escolhe no início da página se trabalha com **Cota** (referência arbitrária) ou **Altitude** (normal, SGB); rótulos e mensagens usam a palavra escolhida (nunca "altura" genérico). A escolha vale para o site todo (`localStorage`).
 - Ângulos sempre sexagesimais, digitados em **GG,MMSS** (formato dos equipamentos: 91,1940 = 91°19'40"); sem graus decimais, grados nem conversores.
+- **Telas enxutas (25/11/2026):** não repetir na tela o que já está no cabeçalho (equipamento, norma, classe, método); textos de ajuda em uma linha; exportações no menu "Exportar"; avisos iguais de várias linhas agrupados (`src/ui/mensagens.js`). O que só serve ao relatório recebe a classe `so-relatorio` (oculto na tela, presente no PDF/Word/planilha).
+- **Tabelas (25/11/2026):** coluna **Desnível (m)** sempre antes da cota/altitude; cabeçalhos por extenso, quebrando em linhas; linhas alternadas branco/cinza-claro na tela; colunas de ponto, status e leituras paradas na rolagem lateral (`fixas` em `criarCaderneta`); nas exportações tudo branco.
 - Projetos são salvos e abertos em arquivo `.niv` (JSON, `formato: "nivelamento-ifsc"`, versionado); resultados não são gravados, sempre recalculados.
 - Arquivos de equipamentos: só implementar leitor com amostra real em `tests/dados/`.
 

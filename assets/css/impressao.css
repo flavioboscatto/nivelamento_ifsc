@@ -68,3 +68,10 @@ body.previa .relatorio { display: block; background: #E9EEEB; min-height: 100vh;
 }
 .folha .caderneta thead th { white-space: normal !important; }
 .folha .caderneta td { white-space: nowrap; }
+
+/* Itens que só aparecem no relatório (ocultos na tela para deixá-la enxuta) */
+.folha .so-relatorio { display: revert !important; }
+.folha th.so-relatorio, .folha td.so-relatorio { display: table-cell !important; }
+/* Na exportação não há colunas paradas nem zebrado */
+.folha th, .folha td, .folha .fixa { position: static !important; box-shadow: none !important; background: none !important; }
+.folha thead th { max-width: none; }

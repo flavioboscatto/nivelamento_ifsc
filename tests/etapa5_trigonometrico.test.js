@@ -127,3 +127,12 @@ test('tabela de curvatura e refração (doc 2, 2.3.2) e efeito residual no geom�
   assert.ok(Math.abs(efeitoResidualGeometrico(119, 0, norma.R_m, norma.k)) < 0.001);
   perto(efeitoResidualGeometrico(60, 50, norma.R_m, norma.k), curvaturaRefracao(60, norma.R_m, norma.k) - curvaturaRefracao(50, norma.R_m, norma.k), 1e-15, 'residual');
 });
+
+test('desnível de cada ponto (geométrico e trigonométrico)', async () => {
+  const { calcularCaderneta } = await import('../src/core/geometrico.js');
+  const g = calcularCaderneta([{ ponto: 'RN80', re: '1,335', dh: 60 }, { ponto: 'A1', vante: '1,511', dh: 55 }], { H_ref: '9,315', pontoRef: 'RN80', sigmaL: 2e-5 });
+  perto(g.pontos[1].desnivel, 1.335 - 1.511, 1e-12, 'Δh = L ré − L vante');
+  const t = caso('T03').visadas[0];
+  const r = calcularTrigonometrico([{ estacao: 'E', i: t.i, ponto: 'P', zpd: t.Z, dh: t.D, s: t.s }], { H_ref: t.H_partida, pontoRef: 'E', R: 6360000 });
+  perto(r.pontos[0].desnivel, r.pontos[0].H - t.H_partida, 1e-12, 'DN = H − H estação');
+});

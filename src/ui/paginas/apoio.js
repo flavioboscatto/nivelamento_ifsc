@@ -70,7 +70,7 @@ function recalcular() {
   const uRes = emMm ? 'mm' : un;
   const idxAtip = new Set(r.atipicas.map((a) => a.indice));
 
-  const alertas = r.atipicas.map((a) => `Observação ${a.indice + 1} (${fx(a.valor, 0)} ${un}) é atípica: afasta-se ${emMm ? `${formatar(a.afastamento * 1000, 1)} mm` : `${fx(a.afastamento)} ${un}`} da média das demais${d.remover ? ' e foi retirada do resultado' : ''}.`);
+  const alertas = r.atipicas.map((a) => `Observação ${a.indice + 1} (${fx(a.valor, 0)} ${un}) atípica: ${emMm ? `${formatar(a.afastamento * 1000, 1)} mm` : `${fx(a.afastamento)} ${un}`} da média das demais${d.remover ? '; retirada' : ''}.`);
   if (r.final.n < 3) erros.push('Restam menos de três observações no resultado final.');
   $('mensagens').innerHTML = `
     ${erros.length ? `<h3 class="titulo-msg erro">Corrija (${erros.length})</h3><ul class="msgs erro">${erros.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
@@ -78,7 +78,7 @@ function recalcular() {
     ${!erros.length && !alertas.length ? '<p class="status ok">✓ Nenhuma observação atípica.</p>' : ''}`;
 
   $('resultado-final').innerHTML = Number.isFinite(r.final.sMedia)
-    ? `x̄ ± s<sub>x̄</sub> = ${fx(r.final.media, 0)} ± ${fx(r.final.sMedia, 0)} ${esc(un)}<small>${esc(d.grandeza || 'Resultado')} — ${r.final.n} de ${valores.length} observações (média ${fx(r.final.media)}; s<sub>x̄</sub> = ${fx(r.final.sMedia)})</small>`
+    ? `x̄ ± s<sub>x̄</sub> = ${fx(r.final.media, 0)} ± ${fx(r.final.sMedia, 0)} ${esc(un)}<small>${d.grandeza ? `${esc(d.grandeza)} — ` : ''}${r.final.n} de ${valores.length} observações</small>`
     : '';
 
   const bloco = (s) => `<dl class="lista-def">

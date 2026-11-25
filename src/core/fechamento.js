@@ -183,11 +183,11 @@ export function calcularNivelamento(linhas, op = {}) {
       if (cumK) sigmaKm = Math.sqrt(sigmaRig(Va.K, VT_K) ** 2 + sigmaKm_m ** 2 * ((e.dhRe + l.dh) / 1000));
     }
     if (!Number.isFinite(correcao) && l.tipo !== 're') {
-      alertas.push(`Linha ${l.linha} (ponto ${l.ponto}): sem DH a correção proporcional à distância não pode ser calculada. Digite a DH ou use a distribuição por estação.`);
+      alertas.push(`Linha ${l.linha} (ponto ${l.ponto}): sem DH, a correção proporcional não é calculada (digite DH ou distribua por estação).`);
     }
     fech.pontos.push({
       linha: l.linha, ponto: l.ponto, estacao: l.estacao, nEstacao: l.nEstacao, tipo: l.tipo, N,
-      H: l.H, correcao, Hcorr: l.H + correcao, sigma, sigmaAnexoL: sigmaAL, sigmaKm, distAcum: l.distAcum,
+      desnivel: l.desnivel, H: l.H, correcao, Hcorr: l.H + correcao, sigma, sigmaAnexoL: sigmaAL, sigmaKm, distAcum: l.distAcum,
     });
   }
 

@@ -263,3 +263,38 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 .resultado-residual { margin: 6px 0 0; color: var(--texto-titulo); font-size: 17px; }
 .acoes-figura { margin-top: 8px; }
 .acoes-figura .botao { padding: 8px 12px; font-size: 13px; }
+
+/* ---------- Páginas enxutas ---------- */
+.so-relatorio { display: none !important; }
+.menu-exportar { position: relative; }
+.menu-exportar > summary { list-style: none; }
+.menu-exportar > summary::-webkit-details-marker { display: none; }
+.menu-exportar > summary::after { content: " ▾"; }
+.menu-exportar .opcoes {
+  position: absolute; z-index: 20; right: 0; top: calc(100% + 4px); min-width: 230px; background: #fff;
+  border: 1px solid var(--borda); box-shadow: 0 8px 24px rgba(12, 28, 40, .15); display: grid; padding: 6px;
+}
+.menu-exportar .opcoes button {
+  font: inherit; font-size: 14px; text-align: left; background: none; border: 0; padding: 8px 10px; cursor: pointer; color: var(--texto-titulo);
+}
+.menu-exportar .opcoes button:hover, .menu-exportar .opcoes button:focus-visible { background: var(--fundo-alt); }
+.menu-exportar .opcoes hr { border: 0; border-top: 1px solid var(--borda); margin: 4px 0; }
+.ajuda-curta { font-size: 14px; margin: 0 0 4px; }
+@media (max-width: 520px) { .menu-exportar .opcoes { right: auto; left: 0; } }
+
+/* ---------- Tabelas: cabeçalhos completos, zebrado e colunas paradas ---------- */
+.caderneta thead th, .tabela-resultado thead th {
+  white-space: normal; vertical-align: bottom; line-height: 1.2; min-width: 0; max-width: 140px;
+}
+.caderneta thead th.num-linha { max-width: none; }
+.caderneta tbody tr:nth-child(odd) > *, .tabela-resultado tbody tr:nth-child(odd) > * { background: #FFFFFF; }
+.caderneta tbody tr:nth-child(even) > *, .tabela-resultado tbody tr:nth-child(even) > * { background: #F2F5F3; }
+.caderneta .calc { color: var(--texto-titulo); }
+.caderneta .fixa { position: sticky; z-index: 1; }
+.caderneta thead .fixa { z-index: 3; }
+.caderneta .fixa-ultima { box-shadow: 6px 0 6px -5px rgba(12, 28, 40, .25); }
+.caderneta tr.com-erro .num-linha.fixa-ultima { box-shadow: inset 4px 0 0 var(--erro), 6px 0 6px -5px rgba(12, 28, 40, .25); }
+.caderneta tr.com-alerta .num-linha.fixa-ultima { box-shadow: inset 4px 0 0 var(--alerta), 6px 0 6px -5px rgba(12, 28, 40, .25); }
+.tabela-resultado tr > :first-child { position: sticky; left: 0; z-index: 1; box-shadow: 6px 0 6px -5px rgba(12, 28, 40, .2); }
+.tabela-resultado thead tr > :first-child { z-index: 3; }
+.tabela-resultado thead th { background: var(--fundo-alt); }

@@ -107,7 +107,7 @@ test('irradiação: pontos irradiados da estação a do circuito G06', () => {
   assert.equal(r.linhas[1].tipo, 'irradiado');
   assert.ok(Number.isNaN(r.linhas[1].sigma), 'sem DH não há σ');
   assert.ok(r.linhas[1].alertas.some((a) => a.includes('desvio-padrão')), 'avisa que falta DH');
-  assert.ok(r.alertas.some((a) => a.includes('não têm verificação de fechamento')));
+  assert.ok(r.alertas.some((a) => a.includes('não têm fechamento')));
   assert.ok(r.verificacao.confere, 'verificação com a vante A1');
 });
 

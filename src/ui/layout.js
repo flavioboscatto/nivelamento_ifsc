@@ -41,8 +41,7 @@ function rodape() {
         <div class="instituicao">
           <strong>Instituto Federal de Santa Catarina</strong>
           Câmpus Florianópolis — Curso Técnico em Agrimensura
-          <p style="margin-top:14px">Ferramenta de aula para nivelamento geométrico e trigonométrico conforme a ABNT NBR 13133:2021.
-          Os cálculos são feitos no seu navegador; nenhum dado é enviado.</p>
+          <p style="margin-top:14px">Nivelamento conforme a ABNT NBR 13133:2021. Cálculo no navegador; nenhum dado é enviado.</p>
         </div>
         <div>
           <h2>Links</h2>

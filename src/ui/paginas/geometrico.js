@@ -6,6 +6,7 @@ import { classeDoNivel } from '../../core/tolerancias.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
 import { perfilSvg } from '../perfil_svg.js';
+import { htmlMensagens } from '../mensagens.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
 import { botaoPng } from '../figuras.js';
 import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
@@ -22,19 +23,19 @@ const lerJson = (rel) => fetch(new URL(rel, import.meta.url)).then((r) => {
 
 const MODOS = {
   irradiacao: {
-    descricao: 'De uma estação: ré no ponto conhecido e leituras nos pontos irradiados (detalhes). Não há fechamento; recomenda-se visar também um ponto de controle.',
+    descricao: 'Ré num ponto conhecido e leituras nos pontos irradiados. Sem fechamento.',
     exemplo: 'nbr_f2.json', rotuloExemplo: 'Exemplo NBR F.2',
   },
   transporte: {
-    descricao: 'Nivelamento e contranivelamento numa caderneta contínua: parte da RN de partida, passa pela RN de chegada e volta à de partida (NBR 13133:2021, 5.5.2.2 e 5.5.2.7). K = extensão do nivelamento (ida).',
+    descricao: 'Ida e volta na mesma caderneta: RN de partida → RN de chegada → RN de partida. K = extensão da ida.',
     exemplo: 'aa_ex1_transporte.json', rotuloExemplo: 'Exemplo AA Ex. I',
   },
   circuito: {
-    descricao: 'Parte e chega na mesma RN. K = perímetro (soma das DH de ré e de vante de mudança; os irradiados não entram).',
+    descricao: 'Parte e chega na mesma RN. K = perímetro.',
     exemplo: 'aa_tab9_circuito.json', rotuloExemplo: 'Exemplo AA Tab. 9',
   },
   linha: {
-    descricao: 'Parte de uma RN e chega em outra RN de altura conhecida. K = extensão da linha.',
+    descricao: 'Parte de uma RN e chega em outra RN conhecida. K = extensão da linha.',
     exemplo: null, rotuloExemplo: 'Exemplo',
   },
 };
@@ -48,20 +49,19 @@ const COLUNAS = [
   },
   { id: 're', rotulo: 'Ré (m)', numero: true, titulo: 'Leitura de ré (fio médio)' },
   { id: 'vante', rotulo: 'Vante (m)', numero: true, titulo: 'Vante de mudança ou ponto final' },
-  { id: 'irradiado', rotulo: 'Irad. (m)', numero: true, titulo: 'Leitura em ponto irradiado' },
-  { id: 'fs', rotulo: 'FS (m)', numero: true, titulo: 'Fio superior (opcional)' },
-  { id: 'fi', rotulo: 'FI (m)', numero: true, titulo: 'Fio inferior (opcional)' },
-  { id: 'dh', rotulo: 'DH (m)', numero: true, titulo: 'Distância horizontal. Vazia: calculada pelos três fios (estadimetria)' },
+  { id: 'irradiado', rotulo: 'Irradiado (m)', numero: true, titulo: 'Leitura em ponto irradiado' },
+  { id: 'fs', rotulo: 'Fio superior FS (m)', numero: true, titulo: 'Opcional' },
+  { id: 'fi', rotulo: 'Fio inferior FI (m)', numero: true, titulo: 'Opcional' },
+  { id: 'dh', rotulo: 'Distância horizontal DH (m)', numero: true, titulo: 'Distância horizontal. Vazia: calculada pelos três fios (estadimetria)' },
   { id: 'obs', rotulo: 'Observação', classe: 'longa' },
 ];
 const CALCULADAS = [
   { id: 'apv', rotulo: 'APV (m)', titulo: 'Altura do plano de visada' },
+  { id: 'desn', rotulo: 'Desnível (m)', titulo: 'Em relação ao ponto de ré da estação (L ré − L)' },
   { id: 'H', rotulo: 'Cota (m)', titulo: 'Valor calculado (antes da distribuição do erro)' },
-  { id: 'corr', rotulo: 'Correção (m)', titulo: 'Parcela do erro de fechamento distribuída ao ponto' },
-  { id: 'Hc', rotulo: 'Cota corr. (m)', titulo: 'Valor corrigido' },
-  { id: 'sigma', rotulo: 'σ (mm)', titulo: 'Desvio-padrão' },
-  { id: 'difRV', rotulo: 'Ré − vante (m)', titulo: 'DH ré − DH vante (equidistância)' },
-  { id: 'acum', rotulo: 'Dist. acum. (m)', titulo: 'Distância acumulada até o ponto' },
+  { id: 'Hc', rotulo: 'Cota corrigida (m)', titulo: 'Valor corrigido' },
+  { id: 'sigma', rotulo: 'Desvio-padrão σ (mm)', titulo: 'Desvio-padrão' },
+  { id: 'difRV', rotulo: 'Diferença ré − vante (m)', titulo: 'DH ré − DH vante (equidistância)' },
   { id: 'situacao', rotulo: 'Situação' },
 ];
 
@@ -86,7 +86,7 @@ function aplicarRotulosAltura() {
   document.querySelectorAll('[data-altura-min]').forEach((el) => { el.textContent = rot === 'Cota' ? 'cotas' : 'altitudes'; });
   if (caderneta) {
     caderneta.renomearColuna('H', `${rot} (m)`);
-    caderneta.renomearColuna('Hc', `${rot} corr. (m)`);
+    caderneta.renomearColuna('Hc', `${rot} corrigida (m)`);
   }
   try { localStorage.setItem(CHAVE_TIPO_ALTURA, tipoAltura()); } catch { /* sem armazenamento */ }
 }
@@ -119,6 +119,7 @@ function definirCabecalho(c = {}) {
 function aplicarInstrumento() {
   const ins = instrumentos.niveis.find((n) => n.id === $('instrumento').value);
   if (!ins) return;
+  if (ins.sigmaLeitura_mm === null) $('det-precisoes').open = true;
   $('sigma-leitura').value = ins.sigmaLeitura_mm === null ? '' : formatar(ins.sigmaLeitura_mm, 1);
   $('dist-ref').value = formatar(ins.distanciaRef_m, 0);
   $('sigma-km').value = ins.sigmaKm_mm === null ? '' : formatar(ins.sigmaKm_mm, 1);
@@ -180,6 +181,7 @@ function recalcular() {
       placeholders: l.dhOrigem === 'estadimetria' ? { dh: formatar(l.dh, 3) } : {},
       valores: {
         apv: l.tipo === 're' ? f3(l.apv) : '',
+        desn: l.tipo !== 're' && Number.isFinite(l.desnivel) ? formatarComSinal(l.desnivel, 3) : '',
         H: f3(l.H),
         corr: pf && Number.isFinite(pf.correcao) && pf.tipo !== 're' ? formatarComSinal(pf.correcao, 4) : '',
         Hc: pf && Number.isFinite(pf.correcao) ? f3(pf.Hcorr) : '',
@@ -240,18 +242,15 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
     : `<p class="status neutro">Não se aplica: ${esc(v.motivo)}</p>`;
 
   // Distâncias
-  const nVis = r.linhas.filter((l) => Number.isFinite(l.dh)).length;
   const temExt = Number.isFinite(r.extensao_m) && r.estacoes.some((e) => e.vantePonto);
   $('distancias').innerHTML = `
     <dl class="lista-def">
       <div><dt>Estações</dt><dd>${r.estacoes.length}</dd></div>
-      <div><dt>Visadas com DH</dt><dd>${nVis} de ${r.linhas.filter((l) => l.tipo).length}</dd></div>
       <div><dt>Extensão (ré + vante de mudança)</dt><dd>${temExt ? `${formatar(r.extensao_m, 3)} m` : '—'}</dd></div>
       ${f?.extensaoIda_m !== undefined ? `
       <div><dt>Nivelamento (ida)</dt><dd>${formatar(f.extensaoIda_m, 3)} m</dd></div>
       <div><dt>Contranivelamento (volta)</dt><dd>${formatar(f.extensaoVolta_m, 3)} m</dd></div>
       <div><dt>Diferença ida × volta</dt><dd>${formatar(f.difExtensao * 100, 1)} %</dd></div>` : ''}
-      ${f?.calculado ? `<div><dt>K (um sentido)</dt><dd>${formatar(f.K_km, 4)} km</dd></div>` : ''}
     </dl>`;
 
   mostrarFechamento(f);
@@ -260,21 +259,22 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
   const comF = f?.calculado;
   const pts = comF ? f.pontos : r.pontos;
   const cabF = comF ? `<th scope="col" class="n">Correção (m)</th><th scope="col" class="n">${rotAltura} corrigida (m)</th>
-        <th scope="col" class="n">σ rigoroso (mm)</th><th scope="col" class="n">σ Anexo L (mm)</th>` : '<th scope="col" class="n">σ F.1 (mm)</th>';
+        <th scope="col" class="n">σ rigoroso (mm)</th><th scope="col" class="n">σ pelo Anexo L (mm)</th>` : '<th scope="col" class="n">σ pela NBR F.1 (mm)</th>';
   $('tabela-pontos').innerHTML = pts.length ? `
     <table class="tabela-resultado">
       <thead><tr><th scope="col">Ponto</th><th scope="col">Estação</th><th scope="col">Tipo</th>
-        <th scope="col" class="n">${rotAltura} calculada (m)</th>${cabF}
-        <th scope="col" class="n">σ por km (mm)<br><small>referência</small></th><th scope="col" class="n">Dist. acum. (m)</th></tr></thead>
+        <th scope="col" class="n">Desnível (m)</th><th scope="col" class="n">${rotAltura} calculada (m)</th>${cabF}
+        <th scope="col" class="n so-relatorio">σ por km (mm)<br><small>referência</small></th><th scope="col" class="n">Distância acumulada (m)</th></tr></thead>
       <tbody>${pts.map((p) => `<tr>
         <th scope="row">${esc(p.ponto)}</th><td>${esc(p.estacao)}</td>
         <td>${{ re: 'Partida', vante: 'Vante', irradiado: 'Irradiado' }[p.tipo]}</td>
+        <td class="n">${p.tipo !== 're' && Number.isFinite(p.desnivel) ? formatarComSinal(p.desnivel, 3) : ''}</td>
         <td class="n">${f3(p.H)}</td>
         ${comF ? `<td class="n">${Number.isFinite(p.correcao) ? formatarComSinal(p.correcao, 4) : '—'}</td>
           <td class="n"><strong>${Number.isFinite(p.correcao) ? f3(p.Hcorr) : '—'}</strong></td>
           <td class="n">${fmm(p.sigma) || '—'}</td><td class="n">${fmm(p.sigmaAnexoL) || '—'}</td>`
     : `<td class="n">${fmm(p.sigma) || '—'}</td>`}
-        <td class="n">${fmm(p.sigmaKm) || '—'}</td>
+        <td class="n so-relatorio">${fmm(p.sigmaKm) || '—'}</td>
         <td class="n">${formatar(p.distAcum, 3) || '—'}</td></tr>`).join('')}</tbody>
     </table>` : '<p>Digite a caderneta para ver as alturas.</p>';
 
@@ -293,10 +293,7 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
 
   // Mensagens
   const erros = [...avisosCab, ...r.erros];
-  $('mensagens').innerHTML = `
-    ${erros.length ? `<h3 class="titulo-msg erro">Corrija (${erros.length})</h3><ul class="msgs erro">${erros.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
-    ${r.alertas.length ? `<h3 class="titulo-msg alerta">Atenção (${r.alertas.length})</h3><ul class="msgs alerta">${r.alertas.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
-    ${!erros.length && !r.alertas.length && pts.length ? '<p class="status ok">✓ Sem erros nem alertas.</p>' : ''}`;
+  $('mensagens').innerHTML = htmlMensagens(erros, r.alertas, { mostrarOk: pts.length > 0 });
 
   // Perfil (alturas corrigidas quando houver fechamento)
   const ptsPerfil = comF ? f.pontos.map((p) => ({ ...p, H: Number.isFinite(p.correcao) ? p.Hcorr : p.H })) : r.pontos;
@@ -321,8 +318,7 @@ function mostrarFechamento(f) {
       <div><dt>${rot} conhecida</dt><dd>${f3(f.Hconhecida)} m</dd></div>
       <div><dt>Erro de fechamento e</dt><dd>${formatarComSinal(e_mm, 1)} mm</dd></div>
       <div><dt>K (extensão em um sentido)</dt><dd>${Number.isFinite(f.K_km) ? `${formatar(f.K_km, 4)} km` : '—'}</dd></div>
-      <div><dt>σ esperado do fechamento</dt><dd>${fmm(f.sigmaEsperado_m) || '—'} mm${Number.isFinite(f.sigmaEsperadoKm_m) ? ` (por km: ${fmm(f.sigmaEsperadoKm_m)})` : ''}</dd></div>
-      <div><dt>|e| / σ esperado</dt><dd>${Number.isFinite(f.razaoErroSigma) ? formatar(f.razaoErroSigma, 1) : '—'}${f.razaoErroSigma > 3 ? ' — acima de 3: possível erro grosseiro' : ''}</dd></div>
+      <div><dt>σ esperado / razão |e|/σ</dt><dd>${fmm(f.sigmaEsperado_m) || '—'} mm / ${Number.isFinite(f.razaoErroSigma) ? formatar(f.razaoErroSigma, 1) : '—'}${f.razaoErroSigma > 3 ? ' (possível erro grosseiro)' : ''}</dd></div>
     </dl>
     ${cl && Number.isFinite(cl.T_mm) ? `<p class="status ${cl.atende ? 'ok' : 'falha'}">${cl.atende ? '✓ Atende' : '✗ Não atende'} à classe ${esc(cl.id)}: |e| = ${formatar(Math.abs(e_mm), 1)} mm ${cl.atende ? '≤' : '>'} T = ${cl.t}√K = ${formatar(cl.T_mm, 1)} mm</p>` : ''}`;
 
@@ -333,8 +329,7 @@ function mostrarFechamento(f) {
         <th scope="row">${esc(t.id)} — ${t.t}√K${t.id === f.classe?.id ? ' <small>(escolhida)</small>' : ''}</th>
         <td class="n">${Number.isFinite(t.T_mm) ? formatar(t.T_mm, 1) : '—'}</td>
         <td class="${t.atende ? 'txt-ok' : 'txt-falha'}">${Number.isFinite(t.T_mm) ? (t.atende ? 'Atende' : 'Não atende') : '—'}</td></tr>`).join('')}</tbody>
-    </table>
-    <p class="nota">Tabela 5: nível classe 1 → 6√K; classe 2 → 8√K; classe 3 → 12√K (K em km).</p>`;
+    </table>`;
 
   const t = f.transporte;
   $('transporte').innerHTML = t ? `
@@ -343,8 +338,7 @@ function mostrarFechamento(f) {
       <div><dt>Δh contranivelamento (volta)</dt><dd>${formatarComSinal(t.dhVolta, 4)} m</dd></div>
       <div><dt>Δh médio = (Δh ida − Δh volta) / 2</dt><dd>${formatarComSinal(t.dhMedio, 4)} m</dd></div>
       <div><dt>${esc(t.ponto)} pela média (AA Eq. 17–19)</dt><dd><strong>${f3(t.H)} m</strong>${Number.isFinite(t.sigma) ? ` ± ${fmm(t.sigma)} mm` : ''}</dd></div>
-    </dl>
-    <p class="nota">σ da média pela forma 4.3.6 c: σ² = σ²(partida) + ¼ (V ida + V volta). Na tabela de ${rotAltura().toLowerCase()}s, ${esc(t.ponto)} aparece com a distribuição escolhida; a diferença entre os dois valores é menor que 1 mm quando ida e volta têm extensões parecidas.</p>` : '';
+    </dl>` : '';
 }
 
 // ---------- Rascunho e modos ----------
@@ -508,7 +502,7 @@ async function iniciar() {
   aplicarInstrumento();
   $('classe').value = classePadrao();
 
-  caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: COLUNAS, calculadas: CALCULADAS, aoMudar: recalcular });
+  caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: COLUNAS, calculadas: CALCULADAS, aoMudar: recalcular, fixas: ['estacao', 'ponto', 'status', 're', 'vante', 'irradiado'] });
 
   rascunho = lerRascunho();
   let tipoSalvo = 'cota';

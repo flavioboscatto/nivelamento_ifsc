@@ -23,7 +23,6 @@
     <div class="container">
       <span class="rotulo">Nivelamento Geométrico</span>
       <h1>Caderneta de <span class="destaque">nivelamento geométrico.</span></h1>
-      <p class="lead-calc">Digite as leituras como na caderneta de papel. As <span data-altura-min>cotas</span>, o APV, as distâncias e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
 
       <section class="barra-projeto" aria-label="Projeto">
         <label class="campo-projeto">Projeto <input id="nome-projeto" autocomplete="off" placeholder="ex.: Aula 3 — circuito do pátio"></label>
@@ -71,41 +70,46 @@
           <label class="so-fechamento largo" data-modos="transporte circuito linha">Distribuição do erro
             <select id="distribuicao">
               <option value="distancia">Proporcional à distância (NBR 13133:2021, 5.5.2.12)</option>
-              <option value="estacao">Por estação (didático, apostila — não previsto na NBR 2021)</option>
+              <option value="estacao">Por estação (didático, fora da NBR)</option>
             </select>
           </label>
-          <label class="so-fechamento marcar largo" data-modos="transporte circuito linha" id="rot-arredondar"><input type="checkbox" id="arredondar-c"> Arredondar C a 0,1 mm como a apostila (só para conferência)</label>
+          <label class="so-fechamento marcar largo" data-modos="transporte circuito linha" id="rot-arredondar"><input type="checkbox" id="arredondar-c"> Arredondar C a 0,1 mm (como a apostila)</label>
           <label class="largo">Nível <select id="instrumento"></select></label>
-          <label>σ da leitura (mm) <input id="sigma-leitura" inputmode="decimal" autocomplete="off"></label>
-          <label>a uma distância de (m) <input id="dist-ref" inputmode="decimal" autocomplete="off"></label>
-          <label>σ por km (mm/km) <input id="sigma-km" inputmode="decimal" autocomplete="off"></label>
-          <details class="largo limites">
-            <summary>Limites dos alertas (do programa, editáveis)</summary>
+          <details class="largo limites" id="det-precisoes">
+            <summary>Precisões do nível e limites dos alertas</summary>
             <div class="grade-campos">
-              <label>Três fios: |FM − (FS+FI)/2| até (mm) <input id="tol-3fios" inputmode="decimal" autocomplete="off"></label>
-              <label>Diferença ré − vante até (m) <input id="dif-rv" inputmode="decimal" autocomplete="off"></label>
+              <label>σ da leitura (mm) <input id="sigma-leitura" inputmode="decimal" autocomplete="off"></label>
+              <label>a uma distância de (m) <input id="dist-ref" inputmode="decimal" autocomplete="off"></label>
+              <label>σ por km (mm/km) <input id="sigma-km" inputmode="decimal" autocomplete="off"></label>
+              <label>Três fios até (mm) <input id="tol-3fios" inputmode="decimal" autocomplete="off"></label>
+              <label>Ré − vante até (m) <input id="dif-rv" inputmode="decimal" autocomplete="off"></label>
             </div>
-            <p class="nota">Fixos pela NBR 13133:2021: visada máxima de 80 m (Tabela 5) e leitura a pelo menos 0,30 m (5.5.2.8).</p>
           </details>
         </form>
       </section>
 
       <section class="bloco" aria-labelledby="t-cad">
         <h2 id="t-cad"><span class="numero">2</span> Caderneta</h2>
-        <p class="nota">Cada linha tem um status: <strong>Ré</strong> (abre uma estação), <strong>Vante</strong> (mudança ou ponto final) ou <strong>Irad.</strong> (ponto irradiado). Digite a leitura na coluna do status ou troque o status na lista — a leitura muda de coluna (útil em dados importados do nível, que não trazem código). DH vazia com FS e FI preenchidos é calculada por estadimetria (DH = 100 × (FS − FI), em itálico). <kbd>Enter</kbd> ou <kbd>Tab</kbd> avançam, <kbd>↑</kbd> <kbd>↓</kbd> mudam de linha; é possível colar um bloco copiado da planilha.</p>
+        <p class="ajuda-curta">Status: <strong>Ré</strong> abre a estação · <strong>Vante</strong> mudança ou ponto final · <strong>Irad.</strong> ponto irradiado. Sem DH, usa FS e FI (estadimetria). Enter avança; aceita colar da planilha.</p>
         <div class="barra-acoes nao-imprimir">
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
           <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
-          <button type="button" class="botao botao-secundario" id="bt-csv-caderneta">CSV da caderneta</button>
-          <button type="button" class="botao botao-secundario" id="bt-csv-resultados">CSV dos resultados</button>
-          <button type="button" class="botao botao-secundario" id="bt-previa">Prévia do relatório</button>
-          <button type="button" class="botao botao-secundario" id="bt-xlsx">Planilha (.xlsx)</button>
-          <button type="button" class="botao botao-secundario" id="bt-docx">Relatório Word (.docx)</button>
-          <button type="button" class="botao botao-primario" id="bt-relatorio">Relatório / PDF</button>
+          <details class="menu-exportar">
+            <summary class="botao botao-primario">Exportar</summary>
+            <div class="opcoes">
+              <button type="button" id="bt-relatorio">Relatório PDF / imprimir</button>
+              <button type="button" id="bt-docx">Relatório Word (.docx)</button>
+              <button type="button" id="bt-previa">Prévia do relatório</button>
+              <hr>
+              <button type="button" id="bt-xlsx">Planilha (.xlsx)</button>
+              <button type="button" id="bt-csv-caderneta">CSV da caderneta</button>
+              <button type="button" id="bt-csv-resultados">CSV dos resultados</button>
+            </div>
+          </details>
         </div>
         <div class="rolagem-tabela" id="caderneta"></div>
-        <p class="nota">Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
+        <p class="ajuda-curta">Rascunho salvo neste navegador.</p>
       </section>
 
       <section class="bloco" aria-labelledby="t-res" aria-live="polite">
@@ -118,15 +122,15 @@
           </div>
           <div class="cartao-resumo cartao-solto so-fechamento" data-modos="transporte"><h3>Nivelamento e contranivelamento</h3><div id="transporte"></div></div>
         </div>
-        <div class="grade-resumo">
+        <div class="grade-resumo grade-fechamento">
           <div class="cartao-resumo"><h3>Verificação aritmética</h3><div id="verificacao"></div></div>
           <div class="cartao-resumo"><h3>Distâncias</h3><div id="distancias"></div></div>
-          <div class="cartao-resumo"><h3>Parâmetros do cálculo</h3><div id="parametros"></div></div>
+          <div class="cartao-resumo so-relatorio"><h3>Parâmetros do cálculo</h3><div id="parametros"></div></div>
         </div>
         <h3 class="subtitulo">Alturas calculadas</h3>
         <div class="rolagem-tabela" id="tabela-pontos"></div>
-        <h3 class="subtitulo">Estações</h3>
-        <div class="rolagem-tabela" id="tabela-estacoes"></div>
+        <h3 class="subtitulo so-relatorio">Estações</h3>
+        <div class="rolagem-tabela so-relatorio" id="tabela-estacoes"></div>
         <h3 class="subtitulo">Perfil</h3>
         <div id="perfil" class="caixa-perfil"></div>
       </section>

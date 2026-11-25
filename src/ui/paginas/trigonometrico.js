@@ -5,6 +5,7 @@ import { calcularTaqueometria } from '../../core/taqueometria.js';
 import { lerAnguloSexagesimal as parseAngulo, formatarDms, AJUDA_ANGULO } from '../../core/angulos.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
+import { htmlMensagens } from '../mensagens.js';
 import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
 import { iniciarRelatorio, tabelaEnxuta, cartoes, bloco, obterDadosRelatorio, definirDadosRelatorio } from '../relatorio.js';
 
@@ -19,94 +20,98 @@ const lerJson = (rel) => fetch(new URL(rel, import.meta.url)).then((r) => { if (
 
 const MODOS = {
   irradiacao: {
-    descricao: 'Da estação, visadas aos pontos de detalhe. Com a estação sobre um ponto conhecido, informe i na linha da estação; com estação livre, faça uma visada de ré a um ponto conhecido.',
-    ajuda: 'Uma linha com "Estação" preenchida abre nova estação. Status: Ré (ponto conhecido, define o eixo do instrumento), Vante ou Irad. (pontos calculados). Sem status = Irad. Preencha Di (distância inclinada) ou DH; Z PI é opcional (série conjugada).',
+    descricao: 'Estação sobre ponto conhecido (com i) ou estação livre (com uma ré).',
+    ajuda: 'Linha com Estação abre nova estação. Status: Ré define o eixo; Vante ou Irad. são calculados (vazio = Irad.). Use Di ou DH; Z PI é opcional.',
   },
   poligonal: {
-    descricao: 'Poligonal altimétrica trigonométrica (classe II N): cada estação tem ré e vante; a estação seguinte começa na vante anterior. Fecha na referência ou num ponto de chegada conhecido. K = soma das DH.',
-    ajuda: 'Cada estação: uma linha de Ré e uma de Vante (pode ter Irad.). Estação livre: ré e vante a partir do instrumento, sem i. Estação sobre o ponto: o nome da estação é o ponto ocupado e i é informado.',
+    descricao: 'Poligonal II N: cada estação tem ré e vante; a seguinte começa na vante anterior. K = soma das DH.',
+    ajuda: 'Cada estação: uma Ré e uma Vante (pode ter Irad.). Estação livre dispensa i.',
   },
   reciprocas: {
-    descricao: 'Visadas recíprocas e simultâneas (NBR 13133:2021, 5.5.3.1): obrigatórias acima de 125 m. O desnível é a média ida/volta, calculada sem curvatura e refração, que se cancelam.',
-    ajuda: 'Cada linha é um par A→B / B→A. A deve ser a referência ou um ponto já calculado numa linha anterior.',
+    descricao: 'Média ida/volta, sem curvatura e refração (se cancelam). Obrigatória acima de 125 m (NBR 5.5.3.1).',
+    ajuda: 'Uma linha por par A→B / B→A. A deve ser a referência ou um ponto já calculado.',
   },
   taqueometria: {
-    descricao: 'Taqueometria e estadimetria (classe III N, visada até 80 m): DH = C·S·sen²Z, DN = DH·cot Z + i − FM, com S = FS − FI e C = 100. Com X, Y da estação e Hz, calcula também as coordenadas.',
-    ajuda: 'Linha da estação: nome do ponto ocupado (a referência ou um ponto já calculado), i e, se quiser, o azimute da direção Hz = 0. Depois, uma linha por ponto: FS, FM, FI, Z e Hz.',
+    descricao: 'Classe III N, visada até 80 m. DH = C·S·sen²Z; DN = DH·cot Z + i − FM.',
+    ajuda: 'Linha da estação: ponto ocupado, i e (opcional) azimute de Hz = 0. Depois, um ponto por linha.',
   },
 };
 
 const STATUS = [['', '—'], ['re', 'Ré'], ['vante', 'Vante'], ['irradiado', 'Irad.']];
 const CONFIG = {
   normal: {
+    fixas: ['estacao', 'i', 'ponto', 'status'],
     colunas: [
       { id: 'estacao', rotulo: 'Estação', classe: 'curta' },
-      { id: 'i', rotulo: 'i (m)', numero: true, titulo: 'Altura do instrumento (estação sobre ponto conhecido)' },
+      { id: 'i', rotulo: 'Altura do instrumento i (m)', numero: true, titulo: 'Estação sobre ponto conhecido' },
       { id: 'ponto', rotulo: 'Ponto' },
       { id: 'status', rotulo: 'Status', opcoes: STATUS },
-      { id: 'zpd', rotulo: 'Z PD', titulo: 'Ângulo zenital em posição direta' },
-      { id: 'zpi', rotulo: 'Z PI', titulo: 'Ângulo zenital em posição inversa (opcional)' },
-      { id: 'di', rotulo: 'Di (m)', numero: true, titulo: 'Distância inclinada' },
-      { id: 'dh', rotulo: 'DH (m)', numero: true, titulo: 'Distância horizontal (se não houver Di)' },
-      { id: 's', rotulo: 's (m)', numero: true, titulo: 'Altura do sinal (prisma ou alvo)' },
+      { id: 'zpd', rotulo: 'Ângulo zenital PD', titulo: 'Posição direta (GG,MMSS)' },
+      { id: 'zpi', rotulo: 'Ângulo zenital PI', titulo: 'Posição inversa, opcional (GG,MMSS)' },
+      { id: 'di', rotulo: 'Distância inclinada Di (m)', numero: true },
+      { id: 'dh', rotulo: 'Distância horizontal DH (m)', numero: true, titulo: 'Se não houver Di' },
+      { id: 's', rotulo: 'Altura do sinal s (m)', numero: true, titulo: 'Prisma ou alvo' },
       { id: 'obs', rotulo: 'Observação', classe: 'longa' },
     ],
     calculadas: [
-      { id: 'z', rotulo: 'Z médio' },
-      { id: 'DH', rotulo: 'DH (m)' },
-      { id: 'DV', rotulo: 'DV (m)' },
-      { id: 'cr', rotulo: 'c+r (mm)', titulo: 'Curvatura e refração (entre parênteses quando não aplicada)' },
+      { id: 'z', rotulo: 'Ângulo zenital médio' },
+      { id: 'DH', rotulo: 'Distância horizontal (m)' },
+      { id: 'DV', rotulo: 'Distância vertical (m)' },
+      { id: 'cr', rotulo: 'Curvatura e refração (mm)', titulo: 'Entre parênteses quando não aplicada' },
+      { id: 'desn', rotulo: 'Desnível (m)', titulo: 'Em relação à ré (estação livre) ou ao ponto ocupado' },
       { id: 'H', rotulo: 'Cota (m)' },
-      { id: 'Hc', rotulo: 'Cota corr. (m)' },
-      { id: 'sigma', rotulo: 'σ (mm)' },
+      { id: 'Hc', rotulo: 'Cota corrigida (m)' },
+      { id: 'sigma', rotulo: 'Desvio-padrão σ (mm)' },
       { id: 'situacao', rotulo: 'Situação' },
     ],
   },
   taqueometria: {
+    fixas: ['estacao', 'i', 'azref', 'ponto'],
     colunas: [
       { id: 'estacao', rotulo: 'Estação', classe: 'curta' },
-      { id: 'i', rotulo: 'i (m)', numero: true, titulo: 'Altura do instrumento' },
-      { id: 'azref', rotulo: 'Az ref.', titulo: 'Azimute da direção Hz = 0 nesta estação (opcional)' },
+      { id: 'i', rotulo: 'Altura do instrumento i (m)', numero: true },
+      { id: 'azref', rotulo: 'Azimute de Hz = 0', titulo: 'Opcional (GG,MMSS)' },
       { id: 'ponto', rotulo: 'Ponto' },
-      { id: 'fs', rotulo: 'FS (m)', numero: true },
-      { id: 'fm', rotulo: 'FM (m)', numero: true },
-      { id: 'fi', rotulo: 'FI (m)', numero: true },
-      { id: 'z', rotulo: 'Z', titulo: 'Ângulo zenital' },
-      { id: 'hz', rotulo: 'Hz', titulo: 'Ângulo horizontal' },
+      { id: 'fs', rotulo: 'Fio superior FS (m)', numero: true },
+      { id: 'fm', rotulo: 'Fio médio FM (m)', numero: true },
+      { id: 'fi', rotulo: 'Fio inferior FI (m)', numero: true },
+      { id: 'z', rotulo: 'Ângulo zenital Z', titulo: 'GG,MMSS' },
+      { id: 'hz', rotulo: 'Ângulo horizontal Hz', titulo: 'GG,MMSS' },
       { id: 'obs', rotulo: 'Observação', classe: 'longa' },
     ],
     calculadas: [
-      { id: 'S', rotulo: 'S (m)', titulo: 'Número gerador FS − FI' },
-      { id: 'DH', rotulo: 'DH (m)' },
-      { id: 'DN', rotulo: 'DN (m)' },
+      { id: 'S', rotulo: 'Número gerador S (m)', titulo: 'FS − FI' },
+      { id: 'DH', rotulo: 'Distância horizontal (m)' },
+      { id: 'DN', rotulo: 'Desnível (m)' },
       { id: 'H', rotulo: 'Cota (m)' },
       { id: 'X', rotulo: 'X (m)' },
       { id: 'Y', rotulo: 'Y (m)' },
-      { id: 'sigma', rotulo: 'σ (mm)' },
+      { id: 'sigma', rotulo: 'Desvio-padrão σ (mm)' },
       { id: 'situacao', rotulo: 'Situação' },
     ],
   },
   reciprocas: {
+    fixas: ['de', 'para'],
     colunas: [
       { id: 'de', rotulo: 'De (A)' },
       { id: 'para', rotulo: 'Para (B)' },
-      { id: 'iA', rotulo: 'i em A (m)', numero: true },
-      { id: 'zAB', rotulo: 'Z A→B' },
-      { id: 'diAB', rotulo: 'Di A→B (m)', numero: true },
-      { id: 'sB', rotulo: 's em B (m)', numero: true },
-      { id: 'iB', rotulo: 'i em B (m)', numero: true },
-      { id: 'zBA', rotulo: 'Z B→A' },
-      { id: 'diBA', rotulo: 'Di B→A (m)', numero: true },
-      { id: 'sA', rotulo: 's em A (m)', numero: true },
+      { id: 'iA', rotulo: 'Instrumento em A, i (m)', numero: true },
+      { id: 'zAB', rotulo: 'Ângulo zenital A→B' },
+      { id: 'diAB', rotulo: 'Distância inclinada A→B (m)', numero: true },
+      { id: 'sB', rotulo: 'Sinal em B, s (m)', numero: true },
+      { id: 'iB', rotulo: 'Instrumento em B, i (m)', numero: true },
+      { id: 'zBA', rotulo: 'Ângulo zenital B→A' },
+      { id: 'diBA', rotulo: 'Distância inclinada B→A (m)', numero: true },
+      { id: 'sA', rotulo: 'Sinal em A, s (m)', numero: true },
     ],
     calculadas: [
-      { id: 'DH', rotulo: 'DH média (m)' },
-      { id: 'dhIda', rotulo: 'Δh A→B (m)' },
-      { id: 'dhVolta', rotulo: 'Δh B→A (m)' },
-      { id: 'dh', rotulo: 'Δh médio (m)' },
-      { id: 'ctrl', rotulo: 'Ida + volta (mm)', titulo: 'Controle: ≈ −2·(c+r)' },
+      { id: 'DH', rotulo: 'Distância horizontal média (m)' },
+      { id: 'dhIda', rotulo: 'Desnível A→B (m)' },
+      { id: 'dhVolta', rotulo: 'Desnível B→A (m)' },
+      { id: 'dh', rotulo: 'Desnível médio (m)' },
+      { id: 'ctrl', rotulo: 'Controle ida + volta (mm)', titulo: '≈ −2·(c+r)' },
       { id: 'H', rotulo: 'Cota de B (m)' },
-      { id: 'sigma', rotulo: 'σ (mm)' },
+      { id: 'sigma', rotulo: 'Desvio-padrão σ (mm)' },
       { id: 'situacao', rotulo: 'Situação' },
     ],
   },
@@ -130,7 +135,7 @@ function aplicarRotulosAltura() {
   document.querySelectorAll('[data-altura-min]').forEach((el) => { el.textContent = rot === 'Cota' ? 'cotas' : 'altitudes'; });
   if (caderneta) {
     caderneta.renomearColuna('H', modo === 'reciprocas' ? `${rot} de B (m)` : `${rot} (m)`);
-    caderneta.renomearColuna('Hc', `${rot} corr. (m)`);
+    caderneta.renomearColuna('Hc', `${rot} corrigida (m)`);
   }
   try { localStorage.setItem(CHAVE_TIPO_ALTURA, tipoAltura()); } catch { /* sem armazenamento */ }
 }
@@ -201,6 +206,7 @@ function mostrarNormal(linhas, op) {
       valores: {
         z: Number.isFinite(l.erroIndice) ? formatarDms(l.Z) : '',
         DH: f3(l.DH), DV: formatarComSinal(l.DV, 3),
+        desn: l.status !== 're' && Number.isFinite(l.desnivel) ? formatarComSinal(l.desnivel, 3) : '',
         cr: Number.isFinite(l.cr) ? (l.crAplicada ? formatar(l.cr * 1000, 1) : `(${formatar(l.cr * 1000, 1)})`) : '',
         H: f3(l.H),
         Hc: p && Number.isFinite(p.correcao) ? f3(p.Hcorr) : '',
@@ -218,11 +224,11 @@ function mostrarNormal(linhas, op) {
   $('tabela-pontos').innerHTML = pts.length ? `
     <table class="tabela-resultado">
       <thead><tr><th scope="col">Ponto</th><th scope="col">Estação</th><th scope="col">Status</th>
-        <th scope="col" class="n">${rot} calculada (m)</th>
+        <th scope="col" class="n">Desnível (m)</th><th scope="col" class="n">${rot} calculada (m)</th>
         ${comF ? `<th scope="col" class="n">Correção (m)</th><th scope="col" class="n">${rot} corrigida (m)</th><th scope="col" class="n">σ rigoroso (mm)</th><th scope="col" class="n">σ Anexo L (mm)</th>` : '<th scope="col" class="n">σ (mm)</th>'}
-        <th scope="col" class="n">Dist. acum. (m)</th></tr></thead>
+        <th scope="col" class="n">Distância acumulada (m)</th></tr></thead>
       <tbody>${pts.map((p) => `<tr><th scope="row">${esc(p.ponto)}</th><td>${esc(p.estacao)}</td>
-        <td>${{ re: 'Partida', vante: 'Vante', irradiado: 'Irradiado' }[p.tipo]}</td><td class="n">${f3(p.H)}</td>
+        <td>${{ re: 'Partida', vante: 'Vante', irradiado: 'Irradiado' }[p.tipo]}</td><td class="n">${p.tipo !== 're' && Number.isFinite(p.desnivel) ? formatarComSinal(p.desnivel, 3) : ''}</td><td class="n">${f3(p.H)}</td>
         ${comF ? `<td class="n">${formatarComSinal(p.correcao, 4)}</td><td class="n"><strong>${f3(p.Hcorr)}</strong></td><td class="n">${fmm(p.sigma)}</td><td class="n">${fmm(p.sigmaAnexoL)}</td>` : `<td class="n">${fmm(p.sigma)}</td>`}
         <td class="n">${formatar(p.distAcum, 3)}</td></tr>`).join('')}</tbody>
     </table>` : '<p>Digite a caderneta para ver os resultados.</p>';
@@ -291,7 +297,7 @@ function mostrarReciprocas(linhas, op) {
   const rot = rotAltura();
   $('tabela-pontos').innerHTML = pts.length ? `
     <table class="tabela-resultado">
-      <thead><tr><th scope="col">Ponto</th><th scope="col">A partir de</th><th scope="col" class="n">DH (m)</th><th scope="col" class="n">Δh médio (m)</th>
+      <thead><tr><th scope="col">Ponto</th><th scope="col">A partir de</th><th scope="col" class="n">Distância horizontal (m)</th><th scope="col" class="n">Desnível médio (m)</th>
         <th scope="col" class="n">${rot} (m)</th><th scope="col" class="n">σ (mm)</th></tr></thead>
       <tbody>${pts.map((p) => `<tr><th scope="row">${esc(p.ponto)}</th><td>${esc(p.de)}</td><td class="n">${f3(p.DH)}</td>
         <td class="n">${formatarComSinal(p.dh, 4)}</td><td class="n"><strong>${f3(p.H)}</strong></td><td class="n">${fmm(p.sigma)}</td></tr>`).join('')}</tbody>
@@ -322,7 +328,7 @@ function mostrarTaqueometria(linhas, op) {
   const temXY = r.pontos.some((p) => Number.isFinite(p.X));
   $('tabela-pontos').innerHTML = r.pontos.length ? `
     <table class="tabela-resultado">
-      <thead><tr><th scope="col">Ponto</th><th scope="col">Estação</th><th scope="col" class="n">DH (m)</th><th scope="col" class="n">DN (m)</th>
+      <thead><tr><th scope="col">Ponto</th><th scope="col">Estação</th><th scope="col" class="n">Distância horizontal (m)</th><th scope="col" class="n">Desnível (m)</th>
         <th scope="col" class="n">${rot} (m)</th><th scope="col" class="n">σ (mm)</th>
         ${temXY ? '<th scope="col" class="n">Azimute</th><th scope="col" class="n">X (m)</th><th scope="col" class="n">Y (m)</th>' : ''}</tr></thead>
       <tbody>${r.pontos.map((p) => `<tr><th scope="row">${esc(p.ponto)}</th><td>${esc(p.estacao)}</td><td class="n">${f3(p.DH)}</td>
@@ -337,10 +343,7 @@ function mostrarTaqueometria(linhas, op) {
 }
 
 function mostrarMensagens(erros, alertas, nPts) {
-  $('mensagens').innerHTML = `
-    ${erros.length ? `<h3 class="titulo-msg erro">Corrija (${erros.length})</h3><ul class="msgs erro">${erros.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
-    ${alertas.length ? `<h3 class="titulo-msg alerta">Atenção (${alertas.length})</h3><ul class="msgs alerta">${alertas.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
-    ${!erros.length && !alertas.length && nPts ? '<p class="status ok">✓ Sem erros nem alertas.</p>' : ''}`;
+  $('mensagens').innerHTML = htmlMensagens(erros, alertas, { mostrarOk: nPts > 0 });
 }
 
 function mostrarFechamento(f) {
@@ -353,8 +356,7 @@ function mostrarFechamento(f) {
       <div><dt>${rot} conhecida</dt><dd>${f3(f.Hconhecida)} m</dd></div>
       <div><dt>Erro de fechamento e</dt><dd>${formatarComSinal(e_mm, 1)} mm</dd></div>
       <div><dt>K (soma das DH)</dt><dd>${formatar(f.K_km, 4)} km</dd></div>
-      <div><dt>σ esperado do fechamento</dt><dd>${fmm(f.sigmaEsperado_m)} mm</dd></div>
-      <div><dt>|e| / σ esperado</dt><dd>${formatar(f.razaoErroSigma, 1)}${f.razaoErroSigma > 3 ? ' — acima de 3: possível erro grosseiro' : ''}</dd></div>
+      <div><dt>σ esperado / razão |e|/σ</dt><dd>${fmm(f.sigmaEsperado_m)} mm / ${formatar(f.razaoErroSigma, 1)}${f.razaoErroSigma > 3 ? ' (possível erro grosseiro)' : ''}</dd></div>
     </dl>
     ${cl ? `<p class="status ${cl.atende ? 'ok' : 'falha'}">${cl.atende ? '✓ Atende' : '✗ Não atende'} à classe ${esc(cl.id)}: |e| = ${formatar(Math.abs(e_mm), 1)} mm ${cl.atende ? '≤' : '>'} T = ${cl.t}√K = ${formatar(cl.T_mm, 1)} mm</p>` : ''}`;
   $('tolerancias').innerHTML = `
@@ -363,7 +365,7 @@ function mostrarFechamento(f) {
       <tbody>${f.tolerancias.map((t) => `<tr${t.id === cl?.id ? ' class="escolhida"' : ''}><th scope="row">${esc(t.id)} — ${t.t}√K${t.id === cl?.id ? ' <small>(escolhida)</small>' : ''}</th>
         <td class="n">${formatar(t.T_mm, 1)}</td><td class="${t.atende ? 'txt-ok' : 'txt-falha'}">${t.atende ? 'Atende' : 'Não atende'}</td></tr>`).join('')}</tbody>
     </table>
-    <p class="nota">Tabela 6: II N com ET classe 1 e duas séries → 120√K (visada até 300 m); ET classe 2 e uma série → 200√K (até 200 m).</p>`;
+`;
 }
 
 function mostrarParametros(op) {
@@ -463,7 +465,7 @@ function lerRascunho() {
 }
 function montarCaderneta() {
   const cfg = CONFIG[modo] ?? CONFIG.normal;
-  caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: cfg.colunas, calculadas: cfg.calculadas, aoMudar: recalcular });
+  caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: cfg.colunas, calculadas: cfg.calculadas, aoMudar: recalcular, fixas: cfg.fixas });
   aplicarRotulosAltura();
 }
 function mostrarModo() {

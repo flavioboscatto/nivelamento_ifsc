@@ -15,8 +15,9 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
  *   calculadas: [{ id, rotulo, titulo? }] (somente leitura)
  *   aoMudar: () => void
  *   linhasIniciais: número de linhas vazias
+ *   fixas: ids das colunas iniciais que ficam paradas na rolagem lateral (ex.: ponto, status, ré, vante)
  */
-export function criarCaderneta({ alvo, colunas, calculadas, aoMudar, linhasIniciais = 6 }) {
+export function criarCaderneta({ alvo, colunas, calculadas, aoMudar, linhasIniciais = 6, fixas = [] }) {
   let linhas = Array.from({ length: linhasIniciais }, () => ({}));
   const editaveis = colunas.filter((c) => !c.opcoes);   // recebem texto colado
   const lista = colunas.find((c) => c.opcoes);
@@ -58,7 +59,42 @@ export function criarCaderneta({ alvo, colunas, calculadas, aoMudar, linhasInici
         ${calculadas.map((c) => `<td class="calc n" data-calc="${c.id}"></td>`).join('')}
         <td class="acao nao-imprimir"><button type="button" class="excluir" data-excluir="${i}" title="Excluir a linha ${i + 1}" aria-label="Excluir a linha ${i + 1}">×</button></td>
       </tr>`).join('');
+    agendarFixar();
   }
+
+  /** Colunas paradas na rolagem lateral: Nº e as colunas iniciais indicadas em `fixas`,
+   *  enquanto couberem em 60 % da largura visível (no celular ficam menos colunas paradas). */
+  function fixarColunas() {
+    const tabela = alvo.querySelector('table');
+    tabela.querySelectorAll('.fixa').forEach((c) => { c.classList.remove('fixa', 'fixa-ultima'); c.style.left = ''; });
+    if (!fixas.length) return;
+    const ids = ['_n', ...colunas.map((c) => c.id)];
+    let n = 1;
+    while (n < ids.length && fixas.includes(ids[n])) n++;
+    const ths = [...tabela.querySelectorAll('thead th')];
+    const limite = alvo.clientWidth * 0.6;
+    const lefts = [];
+    let soma = 0;
+    for (let k = 0; k < n; k++) {
+      const w = ths[k].getBoundingClientRect().width;
+      if (k > 1 && soma + w > limite) break;
+      lefts.push(soma);
+      soma += w;
+    }
+    if (soma >= alvo.clientWidth * 0.9) return; // tela muito estreita: sem colunas paradas
+    tabela.querySelectorAll('tr').forEach((tr) => {
+      lefts.forEach((left, j) => {
+        const c = tr.children[j];
+        if (!c) return;
+        c.classList.add('fixa');
+        c.style.left = `${left}px`;
+        if (j === lefts.length - 1) c.classList.add('fixa-ultima');
+      });
+    });
+  }
+  let esperaFixar = null;
+  const agendarFixar = () => { cancelAnimationFrame(esperaFixar); esperaFixar = requestAnimationFrame(fixarColunas); };
+  window.addEventListener('resize', agendarFixar);
 
   function focar(i, col) {
     const el = tbody.querySelector(`tr[data-i="${i}"] [data-col="${col}"]`);
@@ -173,6 +209,7 @@ export function criarCaderneta({ alvo, colunas, calculadas, aoMudar, linhasInici
     renomearColuna(id, rotulo) {
       const th = alvo.querySelector(`th[data-cab="${id}"]`);
       if (th) th.textContent = rotulo;
+      agendarFixar();
     },
     /** Atualiza células calculadas, estado e dicas da linha i. */
     mostrarLinha(i, { valores = {}, estado = '', placeholders = {}, dica = '' } = {}) {

@@ -89,7 +89,7 @@ export function calcularTrigonometrico(linhas, op = {}) {
       indice: idx, linha: idx + 1, ponto: vazio(b.ponto) ? '' : String(b.ponto).trim(),
       status: ['re', 'vante', 'irradiado'].includes(b.status) ? b.status : 'irradiado',
       Z: NaN, erroIndice: NaN, Di: NaN, DH: NaN, DV: NaN, cr: NaN, crAplicada: false, s: 0, dz: NaN, varDz: NaN,
-      H: NaN, sigma: NaN, distAcum: NaN, estacao: est?.rotulo ?? null, nEstacao: est?.n ?? null, erros: [], alertas: [],
+      H: NaN, desnivel: NaN, sigma: NaN, distAcum: NaN, estacao: est?.rotulo ?? null, nEstacao: est?.n ?? null, erros: [], alertas: [],
     };
     const nome = () => `Linha ${L.linha}${L.estacao ? ` (estação ${L.estacao}${L.ponto ? `, ponto ${L.ponto}` : ''})` : ''}`;
     L.erro = (m) => { L.erros.push(m); erros.push(`${nome()}: ${m}`); };
@@ -153,6 +153,7 @@ export function calcularTrigonometrico(linhas, op = {}) {
       else if (j === 0 && Number.isFinite(Href)) { base = { H: Href, sigma: sigmaRef_m, acum: 0 }; if (ref && e.re.ponto !== ref) e.re.alerta(`a ré foi lida em "${e.re.ponto}", mas o ponto de referência é "${ref}". Usada a ${nomeAltura} da referência.`); }
       if (!base) { e.re.erro(`o ponto de ré "${e.re.ponto}" não tem ${nomeAltura} conhecida.`); return; }
       e.A = base.H - e.re.dz;
+      e.Hbase = base.H;
       e.sigmaA = Math.sqrt(base.sigma ** 2 + e.re.varDz);
       e.acumA = base.acum;
       e.re.H = base.H; e.re.sigma = base.sigma; e.re.distAcum = base.acum;
@@ -165,6 +166,7 @@ export function calcularTrigonometrico(linhas, op = {}) {
       if (!base) { erros.push(`Estação ${e.rotulo}: sem ré e sem ${nomeAltura} conhecida. Faça uma visada de ré ou ocupe um ponto conhecido.`); return; }
       if (!Number.isFinite(e.i)) { erros.push(`Estação ${e.rotulo}: informe a altura do instrumento (i) ou faça uma visada de ré.`); return; }
       e.A = base.H + e.i;
+      e.Hbase = base.H;
       e.sigmaA = Math.sqrt(base.sigma ** 2 + sigmaI_m ** 2);
       e.acumA = base.acum;
       e.distRe = 0;
@@ -173,6 +175,7 @@ export function calcularTrigonometrico(linhas, op = {}) {
     for (const L of e.linhas) {
       if (L === e.re || L.erros.length) continue;
       L.H = e.A + L.dz;
+      L.desnivel = L.H - e.Hbase; // desnível em relação à ré (estação livre) ou ao ponto ocupado
       L.sigma = Math.sqrt(e.sigmaA ** 2 + L.varDz);
       L.distAcum = e.acumA + e.distRe + L.DH;
       if (L.ponto) conhecidos.set(L.ponto, { H: L.H, sigma: L.sigma, acum: L.distAcum });
@@ -184,7 +187,7 @@ export function calcularTrigonometrico(linhas, op = {}) {
   });
 
   const pontos = saida.filter((l) => l.erros.length === 0 && !l.vazia && Number.isFinite(l.H) && l.ponto && l.status !== 're')
-    .map((l) => ({ linha: l.linha, ponto: l.ponto, tipo: l.status, estacao: l.estacao, nEstacao: l.nEstacao, H: l.H, sigma: l.sigma, distAcum: l.distAcum, DH: l.DH }));
+    .map((l) => ({ linha: l.linha, ponto: l.ponto, tipo: l.status, estacao: l.estacao, nEstacao: l.nEstacao, desnivel: l.desnivel, H: l.H, sigma: l.sigma, distAcum: l.distAcum, DH: l.DH }));
 
   const r = { linhas: saida, estacoes, pontos, erros, alertas, metodo, fechamento: null };
   if (metodo === 'poligonal') r.fechamento = fecharPoligonal(r, { ...op, Href, ref });
@@ -242,7 +245,7 @@ function fecharPoligonal(r, op) {
         sigma = Math.sqrt(sigma ** 2 + extra); sigmaAL = Math.sqrt(sigmaAL ** 2 + extra);
       }
       const correcao = correcaoProporcional(erro_m, L.distAcum, extensao_m);
-      f.pontos.push({ linha: L.linha, ponto: L.ponto, tipo: L.status, estacao: e.rotulo, H: L.H, correcao, Hcorr: L.H + correcao, sigma, sigmaAnexoL: sigmaAL, distAcum: L.distAcum });
+      f.pontos.push({ linha: L.linha, ponto: L.ponto, tipo: L.status, estacao: e.rotulo, desnivel: L.desnivel, H: L.H, correcao, Hcorr: L.H + correcao, sigma, sigmaAnexoL: sigmaAL, distAcum: L.distAcum });
     }
   });
   return f;
