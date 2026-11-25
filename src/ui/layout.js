@@ -25,7 +25,7 @@ function cabecalho(paginaAtual) {
       <nav aria-label="Principal">
         <ul class="menu" id="menu-principal">
           ${itens}
-          <li><a class="externo" href="${SITE_CURSO}">Site do curso</a></li>
+          <li><a class="externo" href="${SITE_CURSO}" target="_blank" rel="noopener">Site do curso</a></li>
         </ul>
       </nav>
     </div>

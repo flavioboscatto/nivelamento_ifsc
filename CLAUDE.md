@@ -16,10 +16,12 @@ Leia antes de qualquer tarefa:
 - Pendente da etapa 2: confirmar a família tipográfica do site (usando Inter provisoriamente).
 - **Etapa 3 concluída (aguardando teste manual do professor):** `src/core/geometrico.js` (caderneta, APV, alturas, distâncias, verificação aritmética, alertas, σ F.1), `src/core/tolerancias.js` (classe do nível), `src/ui/caderneta.js`, `src/ui/perfil_svg.js`, `src/ui/paginas/geometrico.js`, `geometrico.html` (modo irradiação); `data/norma_nbr13133_2021.json`, `data/instrumentos.json`, `data/exemplos/nbr_f2.json`; 27 testes passando.
 - Etapa 3: o "Exemplo I da AA / Tabela 1" do aceite fica para quando o professor tiver os dados (25/11/2026); por ora a irradiação é testada com G01 e com a estação a do circuito G06.
-- Tarefa anotada (25/11/2026): no menu, o último item ("Site do curso") deve abrir em nova guia (`target="_blank" rel="noopener"`) — `src/ui/layout.js`.
+- Ajustes pedidos em 25/11/2026 (feitos): status Ré/Vante/Irad. por linha, Cota/Altitude no início da página, projeto em arquivo `.niv` (`src/io/projeto.js`), excluir linha, página "Sobre a norma" só com as seções usadas, "Site do curso" em nova guia.
 - **Etapa 4 concluída (aguardando teste manual do professor):** `src/core/fechamento.js` (transporte, circuito, linha), `ajustamento.js` (proporcional à distância e por estação), `propagacao.js` (4.3.6 a–c e Anexo L), `tolerancias.js` (T = t√K, Tabela 5); página com quatro modos, rascunho por modo e exemplos AA Ex. I e Tab. 9 em `data/exemplos/`; 38 testes passando (G04–G08, P01, tabela 2021 do doc 7).
 - Pendente da etapa 4: G02 e G03 sem dados no projeto (só a tolerância é testada); linha com várias seções/PS é tratada como uma caderneta por seção.
-- **Próxima etapa:** Etapa 5 — nivelamento trigonométrico.
+- **Etapa 5 concluída (aguardando teste manual do professor):** `src/core/trigonometrico.js` (irradiação com Di ou DH, PD/PI, c+r por limiar, σ pela forma geral = F.3, poligonal II N com fechamento, visadas recíprocas), `trigonometrico.html` + `src/ui/paginas/trigonometrico.js`; 50 testes (T01, T03, A01, A04). ET pelas classes da Tabela 2 até chegarem os modelos FOIF/Ruide.
+- Pendente da etapa 5: T02 (Anexo H) sem dados no projeto; T03 3ª visada difere 0,8 mm por arredondamento de c+r na norma (errata E11).
+- **Próxima etapa:** Etapa 6 — taqueometria e estadimetria (Q01 aguarda conferência do professor).
 - Regra geral: **seguir sempre a NBR 13133:2021** (D23–D27).
 - Aguardando: arquivos de amostra (etapas 9–10); modelos/fichas técnicas dos equipamentos; conferência do caso Q01.
 
@@ -48,6 +50,9 @@ Leia antes de qualquer tarefa:
 - Toda altura calculada sai com desvio-padrão.
 - Mensagens de erro em linguagem de agrimensor ("A leitura de vante da estação 3 está vazia"), nunca exceções cruas.
 - Status "Atende / Não atende" sempre em texto, não só por cor.
+- Pontos têm três status: **Ré**, **Vante** e **Irradiado** (abreviado **Irad.**). Não usar "intermediária" na interface.
+- O usuário escolhe no início da página se trabalha com **Cota** (referência arbitrária) ou **Altitude** (normal, SGB); rótulos e mensagens usam a palavra escolhida (nunca "altura" genérico). A escolha vale para o site todo (`localStorage`).
+- Projetos são salvos e abertos em arquivo `.niv` (JSON, `formato: "nivelamento-ifsc"`, versionado); resultados não são gravados, sempre recalculados.
 - Arquivos de equipamentos: só implementar leitor com amostra real em `tests/dados/`.
 
 ## Visual

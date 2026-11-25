@@ -23,7 +23,21 @@
     <div class="container">
       <span class="rotulo">Nivelamento Geométrico</span>
       <h1>Caderneta de <span class="destaque">nivelamento geométrico.</span></h1>
-      <p class="lead-calc">Digite as leituras como na caderneta de papel. As alturas, o APV, as distâncias e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
+      <p class="lead-calc">Digite as leituras como na caderneta de papel. As <span data-altura-min>cotas</span>, o APV, as distâncias e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
+
+      <section class="barra-projeto" aria-label="Projeto">
+        <label class="campo-projeto">Projeto <input id="nome-projeto" autocomplete="off" placeholder="ex.: Aula 3 — circuito do pátio"></label>
+        <fieldset class="escolha-altura">
+          <legend>Trabalhar com</legend>
+          <label><input type="radio" name="tipo-altura" value="cota" checked> Cota <small>(referência arbitrária)</small></label>
+          <label><input type="radio" name="tipo-altura" value="altitude_normal"> Altitude <small>(normal, referida ao SGB)</small></label>
+        </fieldset>
+        <div class="acoes-projeto nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-abrir">Abrir projeto</button>
+          <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
+          <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
+        </div>
+      </section>
 
       <div class="abas-modo" role="tablist" aria-label="Modo de cálculo">
         <button type="button" class="aba" role="tab" data-modo="irradiacao">Irradiação</button>
@@ -37,16 +51,10 @@
         <h2 id="t-cab"><span class="numero">1</span> Dados do levantamento</h2>
         <form id="form-cabecalho" class="grade-campos">
           <label>Ponto de referência <input id="ref-ponto" autocomplete="off" placeholder="ex.: RN1"></label>
-          <label>Altura da referência (m) <input id="ref-h" inputmode="decimal" autocomplete="off" placeholder="ex.: 9,315"></label>
+          <label><span><span data-altura>Cota</span> da referência (m)</span> <input id="ref-h" inputmode="decimal" autocomplete="off" placeholder="ex.: 9,315"></label>
           <label>σ da referência (mm) <input id="ref-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-          <label>Tipo de altura
-            <select id="tipo-altura">
-              <option value="cota">Cota (referência arbitrária)</option>
-              <option value="altitude_normal">Altitude normal (SGB)</option>
-            </select>
-          </label>
           <label class="so-fechamento" data-modos="transporte linha">RN de chegada <input id="cheg-ponto" autocomplete="off" placeholder="ex.: RN2"></label>
-          <label class="so-fechamento" data-modos="linha">Altura da RN de chegada (m) <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
+          <label class="so-fechamento" data-modos="linha"><span><span data-altura>Cota</span> da RN de chegada (m)</span> <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
           <label class="so-fechamento" data-modos="linha">σ da RN de chegada (mm) <input id="cheg-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
           <label class="so-fechamento largo" data-modos="transporte circuito linha">Classe (NBR 13133:2021, Tabela 5) <select id="classe"></select></label>
           <label class="so-fechamento largo" data-modos="transporte circuito linha">Distribuição do erro
@@ -73,16 +81,15 @@
 
       <section class="bloco" aria-labelledby="t-cad">
         <h2 id="t-cad"><span class="numero">2</span> Caderneta</h2>
-        <p class="nota">Cada leitura de <strong>ré</strong> abre uma estação. Na mesma estação, use <strong>vante</strong> para a mudança (ou o ponto final) e <strong>intermediária</strong> para os pontos irradiados. DH vazia com FS e FI preenchidos é calculada por estadimetria (DH = 100 × (FS − FI), em itálico). <kbd>Enter</kbd> ou <kbd>Tab</kbd> avançam, <kbd>↑</kbd> <kbd>↓</kbd> mudam de linha; é possível colar um bloco copiado da planilha.</p>
+        <p class="nota">Cada linha tem um status: <strong>Ré</strong> (abre uma estação), <strong>Vante</strong> (mudança ou ponto final) ou <strong>Irad.</strong> (ponto irradiado). Digite a leitura na coluna do status ou troque o status na lista — a leitura muda de coluna (útil em dados importados do nível, que não trazem código). DH vazia com FS e FI preenchidos é calculada por estadimetria (DH = 100 × (FS − FI), em itálico). <kbd>Enter</kbd> ou <kbd>Tab</kbd> avançam, <kbd>↑</kbd> <kbd>↓</kbd> mudam de linha; é possível colar um bloco copiado da planilha.</p>
         <div class="barra-acoes nao-imprimir">
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
-          <button type="button" class="botao botao-secundario" id="bt-remover">− Remover linha</button>
           <button type="button" class="botao botao-secundario" id="bt-exemplo">Exemplo</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
           <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
         </div>
         <div class="rolagem-tabela" id="caderneta"></div>
-        <p class="nota">O rascunho fica salvo só neste navegador.</p>
+        <p class="nota">Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
       </section>
 
       <section class="bloco" aria-labelledby="t-res" aria-live="polite">

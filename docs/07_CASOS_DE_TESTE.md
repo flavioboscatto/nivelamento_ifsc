@@ -72,4 +72,5 @@ Q01: a apostila não traz a resposta (página "Resposta do Exercício V" em bran
 | E7 | IA 5.6 x NBR 2021 | Apostila: correção de curvatura e refração para visadas > 150 m, R = 6 400 km; NBR 2021: > 125 m | Programa usa 125 m (2021); R padrão 6 371 km |
 | E8 | IA 2.1.6 x NBR 2021 Tabela 3 | Classes de níveis invertidas entre edições | Rótulo sempre com mm/km |
 | E10 | NBR Anexos H e I | Coeficiente escrito "68,398 × 10⁻¹² × D²"; com D em metros o correto é **68,398 × 10⁻⁹** (= 0,87 / (2 × 6 360 000)). Os valores tabelados (0,002 / 0,008 / 0,015 m) conferem com 10⁻⁹ | Usar $(1-k)/(2R)$; nunca a constante impressa |
+| E11 | NBR Anexo I, Tab. I.1 | c+r arredondado ao milímetro antes de somar (0,015 m na 3ª visada; o valor exato é 0,0154 m). Sem o arredondamento, a 3ª estação dá 37,2368 m (37,237), não 37,236 | Programa usa c+r exato; teste aceita 1 mm na 3ª visada |
 | E9 | IA 4.1 / AA | "Leitura mínima 0,500" (1994) x 30 cm de qualquer superfície (2021 5.5.2.8) | Programa usa 30 cm (2021) |

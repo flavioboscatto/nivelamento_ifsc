@@ -167,7 +167,7 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 .perfil .titulo-eixo { font-weight: 600; }
 .perfil .traco { fill: none; stroke: var(--verde-escuro); stroke-width: 2; }
 .perfil .ponto circle { fill: var(--verde-escuro); stroke: #fff; stroke-width: 1.5; }
-.perfil .ponto.intermediaria circle { fill: #fff; stroke: var(--verde-escuro); stroke-width: 2; }
+.perfil .ponto.irradiado circle { fill: #fff; stroke: var(--verde-escuro); stroke-width: 2; }
 .perfil .ponto text { fill: var(--texto-titulo); font-size: 12px; font-weight: 600; }
 
 @media (max-width: 900px) {
@@ -208,3 +208,34 @@ kbd { font: inherit; font-size: 13px; border: 1px solid var(--borda); padding: 0
 @media (max-width: 520px) { .lista-def div { grid-template-columns: minmax(0, 1fr); gap: 0; } .lista-def dd { text-align: left; } }
 .grade-campos > * { min-width: 0; }
 .grade-campos select { width: 100%; text-overflow: ellipsis; }
+
+/* ---------- Projeto, status por linha e exclusão ---------- */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.barra-projeto {
+  display: grid; grid-template-columns: minmax(0, 1.2fr) auto auto; gap: 16px 28px; align-items: end;
+  margin-top: 28px; padding: 18px 20px; border: 1px solid var(--borda); border-left: 4px solid var(--verde);
+}
+.campo-projeto { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600; color: var(--texto-titulo); min-width: 0; }
+.campo-projeto input { font: inherit; font-size: 16px; font-weight: 400; padding: 9px 10px; border: 1px solid #B9C3CA; border-radius: var(--raio); min-width: 0; }
+.escolha-altura { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.escolha-altura legend { font-size: 14px; font-weight: 600; color: var(--texto-titulo); padding: 0; margin-bottom: 6px; }
+.escolha-altura label { display: flex; align-items: center; gap: 6px; color: var(--texto-titulo); font-weight: 600; white-space: nowrap; }
+.escolha-altura small { color: var(--texto); font-weight: 400; }
+.escolha-altura input { width: 18px; height: 18px; accent-color: var(--verde-escuro); }
+.acoes-projeto { display: flex; flex-wrap: wrap; gap: 8px; }
+.acoes-projeto .botao { padding: 9px 14px; font-size: 13px; }
+@media (max-width: 960px) { .barra-projeto { grid-template-columns: minmax(0, 1fr); } }
+
+.caderneta td.lista select { border: 0; background: transparent; font: inherit; color: var(--texto-titulo); padding: 7px 4px; min-width: 76px; }
+.caderneta td.lista select:focus { outline: 2px solid var(--verde-escuro); outline-offset: -2px; }
+.caderneta td.acao, .caderneta th.acao { width: 1%; padding: 0 4px; text-align: center; border-left: 1px solid var(--borda); }
+.caderneta .excluir {
+  border: 0; background: none; color: var(--texto); font-size: 20px; line-height: 1; padding: 4px 8px; cursor: pointer;
+}
+.caderneta .excluir:hover, .caderneta .excluir:focus-visible { color: var(--erro); }
+@media print { .barra-projeto .acoes-projeto, .escolha-altura input:not(:checked) + * { display: none; } .caderneta td.lista select { appearance: none; } }
+.texto-sobre { max-width: 860px; }
+.lista-norma { padding-left: 20px; color: var(--texto-titulo); }
+.lista-norma li { margin: 8px 0; }
+.rolagem-tabela { position: relative; }
+.sr { left: 0; top: 0; }

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
-  calcularCaderneta, sigmaIntermediaria, sigmaVanteF1, sigmaLeituraPorMetro,
+  calcularCaderneta, sigmaIrradiado, sigmaVanteF1, sigmaLeituraPorMetro,
 } from '../src/core/geometrico.js';
 
 const ler = (rel) => JSON.parse(readFileSync(new URL(rel, import.meta.url), 'utf8'));
@@ -35,7 +35,7 @@ function cadernetaG06() {
     const est = String.fromCharCode(97 + j); // a, b, c…
     linhas.push({ estacao: est, ponto: rePonto, re: e.re, dh: dh[j][1] });
     for (const [p, leit] of Object.entries(e.intermediarias)) {
-      linhas.push({ ponto: p, intermediaria: String(leit).replace('.', ','), dh: p === '14' ? 12.356 : '' });
+      linhas.push({ ponto: p, irradiado: String(leit).replace('.', ','), dh: p === '14' ? 12.356 : '' });
     }
     linhas.push({ ponto: e.mudanca[0], vante: e.mudanca[1], dh: dh[j][2] });
     rePonto = e.mudanca[0];
@@ -89,14 +89,14 @@ test('P01 — σ encadeado pela NBR F.1 até o fecho ≈ √VT = 3,87 mm', () =>
   perto(rn2.sigma * 1000, caso('P01').esperado_mm.sigma_fecho_leitura, casos.tolerancia_numerica.mm, 'σ no fecho');
 });
 
-test('P01 — σ do ponto intermediário 14 (4.3.6 d) = 2,02 mm', () => {
-  const s = sigmaIntermediaria(0.00172, 2e-5, 51.436, 12.356);
+test('P01 — σ do ponto irradiado 14 (4.3.6 d) = 2,02 mm', () => {
+  const s = sigmaIrradiado(0.00172, 2e-5, 51.436, 12.356);
   perto(s * 1000, caso('P01').esperado_mm.intermediario_14, casos.tolerancia_numerica.mm, 'σ(14)');
   // Com visadas iguais, a forma sem simplificação coincide com a F.1
-  perto(sigmaIntermediaria(0.001, 2e-5, 40, 40), sigmaVanteF1(0.001, 2e-5, 40, 40), 1e-15, 'equidistantes');
+  perto(sigmaIrradiado(0.001, 2e-5, 40, 40), sigmaVanteF1(0.001, 2e-5, 40, 40), 1e-15, 'equidistantes');
 });
 
-test('irradiação: intermediárias da estação a do circuito G06', () => {
+test('irradiação: pontos irradiados da estação a do circuito G06', () => {
   const { g06, linhas } = cadernetaG06();
   const r = calcularCaderneta(linhas.slice(0, 5), { H_ref: g06.H_RN, pontoRef: 'RN2', sigmaL: 2e-5, ...limites });
   assert.deepEqual(r.erros, []);
@@ -104,8 +104,7 @@ test('irradiação: intermediárias da estação a do circuito G06', () => {
   perto(H('1'), 6.300, TOL_H, 'ponto 1');
   perto(H('2'), 5.783, TOL_H, 'ponto 2');
   perto(H('3'), 5.880, TOL_H, 'ponto 3');
-  assert.equal(r.linhas[1].intermediaria, undefined);
-  assert.equal(r.linhas[1].tipo, 'intermediaria');
+  assert.equal(r.linhas[1].tipo, 'irradiado');
   assert.ok(Number.isNaN(r.linhas[1].sigma), 'sem DH não há σ');
   assert.ok(r.linhas[1].alertas.some((a) => a.includes('desvio-padrão')), 'avisa que falta DH');
   assert.ok(r.alertas.some((a) => a.includes('não têm verificação de fechamento')));
@@ -115,7 +114,7 @@ test('irradiação: intermediárias da estação a do circuito G06', () => {
 test('irradiação sem vante: verificação aritmética não se aplica', () => {
   const r = calcularCaderneta([
     { estacao: '1', ponto: 'RN1', re: '1,500', dh: '30' },
-    { ponto: 'P1', intermediaria: '1,200', dh: '25' },
+    { ponto: 'P1', irradiado: '1,200', dh: '25' },
   ], { H_ref: '100,000', sigmaRef_m: 0.002, pontoRef: 'RN1', sigmaL: 2e-5, ...limites });
   assert.deepEqual(r.erros, []);
   perto(r.pontos[1].H, 100.3, 1e-9, 'P1');
@@ -165,14 +164,14 @@ test('erros em linguagem de agrimensor, sem perder o resto da caderneta', () => 
   const r = calcularCaderneta([
     { estacao: '1', ponto: 'RN1', re: '1,500', dh: 30 },
     { ponto: 'A1', vante: '' },
-    { ponto: 'A2', intermediaria: '1,2x' },
-    { ponto: 'A3', intermediaria: '1,300', vante: '1,400' },
+    { ponto: 'A2', irradiado: '1,2x' },
+    { ponto: 'A3', irradiado: '1,300', vante: '1,400' },
     { ponto: 'A4', vante: '1,100', dh: 30 },
     { ponto: 'A5', vante: '1,000' },
   ], { H_ref: 10, sigmaL: 2e-5, ...limites });
   assert.equal(r.valido, false);
   assert.match(r.erros[0], /^Linha 2 \(estação 1, ponto A1\): a leitura na mira está vazia/);
-  assert.match(r.erros[1], /Linha 3 .*intermediária "1,2x" não é um número/);
+  assert.match(r.erros[1], /Linha 3 .*irradiado "1,2x" não é um número/);
   assert.match(r.erros[2], /Linha 4 .*só uma leitura por linha/);
   assert.match(r.erros[3], /Linha 6 .*já tem uma vante \(A4\)/);
   perto(r.pontos.find((p) => p.ponto === 'A4').H, 10.4, 1e-9, 'A4 calculado mesmo com erros em outras linhas');
@@ -182,16 +181,16 @@ test('caderneta precisa começar com ré e ter altura de referência', () => {
   const r1 = calcularCaderneta([{ ponto: 'A', vante: 1.2 }], { H_ref: 10 });
   assert.match(r1.erros[0], /começar com uma leitura de ré/);
   const r2 = calcularCaderneta([{ ponto: 'RN1', re: 1.5 }, { ponto: 'A', vante: 1.2 }], { H_ref: '' });
-  assert.match(r2.erros[0], /Informe a altura/);
+  assert.match(r2.erros[0], /Informe a cota do ponto de referência/);
   assert.ok(Number.isNaN(r2.linhas[1].H));
 });
 
 test('ré de nova estação em ponto já calculado (irradiação a partir de outro ponto)', () => {
   const r = calcularCaderneta([
     { estacao: '1', ponto: 'RN1', re: 1.5, dh: 20 },
-    { ponto: 'P1', intermediaria: 1.0, dh: 20 },
+    { ponto: 'P1', irradiado: 1.0, dh: 20 },
     { estacao: '2', ponto: 'P1', re: 1.2, dh: 20 },
-    { ponto: 'P2', intermediaria: 0.7, dh: 20 },
+    { ponto: 'P2', irradiado: 0.7, dh: 20 },
   ], { H_ref: 10, pontoRef: 'RN1', sigmaL: 2e-5, ...limites });
   assert.deepEqual(r.erros, []);
   perto(r.pontos.find((p) => p.ponto === 'P2').H, 11.0, 1e-9, 'P2');

@@ -29,7 +29,7 @@ export function calcularNivelamento(linhas, op = {}) {
   const {
     metodo = 'irradiacao', pontoChegada = '', H_chegada, sigmaChegada_m = 0,
     distribuicao = 'distancia', arredondarC = false, classes = [], classeId = null, classeNivel = null,
-    sigmaRef_m = 0, sigmaL = null, sigmaKm_m = null, pontoRef = '', difExtensaoMax = 0.10,
+    sigmaRef_m = 0, sigmaL = null, sigmaKm_m = null, pontoRef = '', difExtensaoMax = 0.10, nomeAltura = 'cota',
   } = op;
 
   const cad = calcularCaderneta(linhas, op);
@@ -37,7 +37,7 @@ export function calcularNivelamento(linhas, op = {}) {
 
   const erros = [...cad.erros];
   const alertas = [...cad.alertas];
-  // A recomendação das intermediárias não vale para os modos com fechamento: elas continuam sem
+  // A recomendação dos irradiados não vale para os modos com fechamento: elas continuam sem
   // controle próprio, mas o aviso geral de "sem verificação" é substituído pelo fechamento.
   const iIrr = alertas.findIndex((a) => a.startsWith('Pontos irradiados'));
   if (iIrr >= 0) alertas.splice(iIrr, 1);
@@ -64,8 +64,8 @@ export function calcularNivelamento(linhas, op = {}) {
   if (metodo === 'linha') {
     const hB = parseDecimal(H_chegada);
     if (!Number.isFinite(hB)) {
-      erros.push(`Informe a altura conhecida da RN de chegada${pontoChegada ? ` (${pontoChegada})` : ''}.`);
-      fech.motivo = 'Falta a altura da RN de chegada.';
+      erros.push(`Informe a ${nomeAltura} conhecida da RN de chegada${pontoChegada ? ` (${pontoChegada})` : ''}.`);
+      fech.motivo = `Falta a ${nomeAltura} da RN de chegada.`;
       return fim();
     }
     Hconhecida = hB;
@@ -173,7 +173,7 @@ export function calcularNivelamento(linhas, op = {}) {
       if (cumL) { sigma = sigmaRig(Va.L, VT_L); sigmaAL = sigmaL_(Va.L, VT_L); }
       if (cumK) sigmaKm = sigmaRig(Va.K, VT_K);
     } else if (Number.isFinite(l.dh)) {
-      // (d) intermediária: σ do ponto de ré da estação + a própria irradiação
+      // (d) irradiado: σ do ponto de ré da estação + a própria irradiação
       if (cumL) {
         const base = sigmaRig(Va.L, VT_L), baseAL = sigmaL_(Va.L, VT_L);
         const extra = (sigmaL * e.dhRe) ** 2 + (sigmaL * l.dh) ** 2;

@@ -105,7 +105,7 @@ function cadernetaG06() {
   let rePonto = 'RN2';
   g.estacoes.forEach((e, j) => {
     linhas.push({ estacao: String.fromCharCode(97 + j), ponto: rePonto, re: e.re, dh: dh[j][1] });
-    for (const [p, leit] of Object.entries(e.intermediarias)) linhas.push({ ponto: p, intermediaria: leit, dh: p === '14' ? 12.356 : '' });
+    for (const [p, leit] of Object.entries(e.intermediarias)) linhas.push({ ponto: p, irradiado: leit, dh: p === '14' ? 12.356 : '' });
     linhas.push({ ponto: e.mudanca[0], vante: e.mudanca[1], dh: dh[j][2] });
     rePonto = e.mudanca[0];
   });
@@ -138,8 +138,8 @@ test('G06 — distribuição proporcional à distância (NBR 5.5.2.12, padrão)'
   perto(a1.correcao, 0.011 * (55.689 + 63.436) / 718.254, 1e-12, 'correção A1');
   perto(f.pontos.at(-1).Hcorr, g.H_RN, 1e-9, 'fecho corrigido = RN2');
   const p14 = f.pontos.find((p) => p.ponto === '14');
-  assert.ok(Number.isFinite(p14.correcao), 'intermediária com DH recebe correção');
-  assert.ok(r.alertas.some((a) => a.includes('ponto 1)') && a.includes('correção proporcional')), 'intermediária sem DH avisa');
+  assert.ok(Number.isFinite(p14.correcao), 'irradiado com DH recebe correção');
+  assert.ok(r.alertas.some((a) => a.includes('ponto 1)') && a.includes('correção proporcional')), 'irradiado sem DH avisa');
 });
 
 test('P01 — σ rigoroso (4.3.6 a), Anexo L e σ por km no circuito G06', () => {
@@ -154,7 +154,7 @@ test('P01 — σ rigoroso (4.3.6 a), Anexo L e σ por km no circuito G06', () =>
     perto(pt.sigmaAnexoL * 1000, esp.anexoL_leitura[p], TOL_MM, `σ Anexo L ${p}`);
     perto(pt.sigmaKm * 1000, esp.rigorosa_km[p], TOL_MM, `σ por km ${p}`);
   }
-  perto(f.pontos.find((x) => x.ponto === '14').sigma * 1000, esp.intermediario_14, TOL_MM, 'σ intermediário 14');
+  perto(f.pontos.find((x) => x.ponto === '14').sigma * 1000, esp.intermediario_14, TOL_MM, 'σ irradiado 14');
   perto(f.sigmaEsperado_m * 1000, esp.sigma_fecho_leitura, TOL_MM, 'σ esperado do fechamento');
   perto(f.sigmaEsperadoKm_m * 1000, esp.sigma_fecho_km, TOL_MM, 'σ esperado por km');
 });
@@ -202,14 +202,14 @@ test('mensagens de erro do fechamento', () => {
   assert.ok(semVolta.erros.some((e) => e.includes('Falta o contranivelamento')));
 
   const semVante = calcularNivelamento([
-    { ponto: 'RN1', re: 1.5, dh: 30 }, { ponto: 'A', intermediaria: 1.2, dh: 30 },
+    { ponto: 'RN1', re: 1.5, dh: 30 }, { ponto: 'A', irradiado: 1.2, dh: 30 },
   ], { ...base, metodo: 'circuito', H_ref: 10, pontoRef: 'RN1' });
   assert.ok(semVante.erros.some((e) => e.includes('falta a vante de mudança')));
 
   const semB = calcularNivelamento([
     { ponto: 'RNA', re: 1.5, dh: 30 }, { ponto: 'RNB', vante: 1.2, dh: 30 },
   ], { ...base, metodo: 'linha', H_ref: 10, pontoRef: 'RNA', pontoChegada: 'RNB' });
-  assert.ok(semB.erros.some((e) => e.includes('altura conhecida da RN de chegada')));
+  assert.ok(semB.erros.some((e) => e.includes('cota conhecida da RN de chegada')));
 });
 
 test('funções isoladas: correções e Anexo L ≥ rigorosa', () => {

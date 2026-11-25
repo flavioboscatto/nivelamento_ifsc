@@ -15,15 +15,94 @@
   <link rel="stylesheet" href="assets/css/componentes.css">
   <link rel="stylesheet" href="assets/css/impressao.css">
   <script type="module" src="src/ui/layout.js"></script>
+  <script type="module" src="src/ui/paginas/trigonometrico.js"></script>
 </head>
 <body data-pagina="trigonometrico">
   <div id="cabecalho"></div>
-  <main id="conteudo" class="em-construcao">
+  <main id="conteudo" class="pagina-calculo">
     <div class="container">
       <span class="rotulo">Nivelamento Trigonométrico</span>
-      <h1>Nivelamento <span class="destaque">trigonométrico.</span></h1>
-      <p class="aviso">A caderneta de nivelamento trigonométrico (irradiação, poligonal altimétrica, visadas recíprocas e taqueometria) está em desenvolvimento — etapas 5 e 6 do plano.</p>
-      <p style="margin-top:28px"><a class="botao botao-secundario" href="index.html">Voltar ao início</a></p>
+      <h1>Caderneta de <span class="destaque">nivelamento trigonométrico.</span></h1>
+      <p class="lead-calc">Digite o ângulo zenital, a distância e as alturas do instrumento e do sinal. As <span data-altura-min>cotas</span>, a curvatura e refração e o desvio-padrão são calculados enquanto você digita, conforme a ABNT NBR 13133:2021.</p>
+
+      <section class="barra-projeto" aria-label="Projeto">
+        <label class="campo-projeto">Projeto <input id="nome-projeto" autocomplete="off" placeholder="ex.: Aula 5 — poligonal do pátio"></label>
+        <fieldset class="escolha-altura">
+          <legend>Trabalhar com</legend>
+          <label><input type="radio" name="tipo-altura" value="cota" checked> Cota <small>(referência arbitrária)</small></label>
+          <label><input type="radio" name="tipo-altura" value="altitude_normal"> Altitude <small>(normal, referida ao SGB)</small></label>
+        </fieldset>
+        <div class="acoes-projeto nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-abrir">Abrir projeto</button>
+          <button type="button" class="botao botao-primario" id="bt-salvar">Salvar projeto (.niv)</button>
+          <input type="file" id="arquivo-projeto" accept=".niv,.json,application/json" hidden>
+        </div>
+      </section>
+
+      <div class="abas-modo" role="tablist" aria-label="Modo de cálculo">
+        <button type="button" class="aba" role="tab" data-modo="irradiacao">Irradiação</button>
+        <button type="button" class="aba" role="tab" data-modo="poligonal">Poligonal altimétrica</button>
+        <button type="button" class="aba" role="tab" data-modo="reciprocas">Visadas recíprocas</button>
+        <span class="aba inativa" title="Etapa 6 do plano">Taqueometria <small>em breve</small></span>
+      </div>
+      <p class="nota" id="descricao-modo"></p>
+
+      <section class="bloco" aria-labelledby="t-cab">
+        <h2 id="t-cab"><span class="numero">1</span> Dados do levantamento</h2>
+        <form id="form-cabecalho" class="grade-campos">
+          <label>Ponto de referência <input id="ref-ponto" autocomplete="off" placeholder="ex.: E01"></label>
+          <label><span><span data-altura>Cota</span> da referência (m)</span> <input id="ref-h" inputmode="decimal" autocomplete="off"></label>
+          <label>σ da referência (mm) <input id="ref-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label data-modos="poligonal">Ponto de chegada <input id="cheg-ponto" autocomplete="off" placeholder="vazio = fecha na referência"></label>
+          <label data-modos="poligonal"><span><span data-altura>Cota</span> do ponto de chegada (m)</span> <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="poligonal">σ do ponto de chegada (mm) <input id="cheg-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label class="largo" data-modos="poligonal">Classe (NBR 13133:2021, Tabela 6) <select id="classe"></select></label>
+          <label class="largo">Estação total <select id="instrumento"></select></label>
+          <label>σ do ângulo zenital (") <input id="sigma-z" inputmode="decimal" autocomplete="off"></label>
+          <label>σ da distância: a (mm) <input id="dist-a" inputmode="decimal" autocomplete="off"></label>
+          <label>σ da distância: b (ppm) <input id="dist-b" inputmode="decimal" autocomplete="off"></label>
+          <label>σ de i e de s (mm) <input id="sigma-is" inputmode="decimal" autocomplete="off"></label>
+          <label>Curvatura e refração
+            <select id="aplicar-cr">
+              <option value="auto">Acima do limite (NBR 5.5.3.1)</option>
+              <option value="sempre">Sempre</option>
+              <option value="nunca">Nunca</option>
+            </select>
+          </label>
+          <label>Limite para c+r (m) <input id="limiar-cr" inputmode="decimal" autocomplete="off"></label>
+          <label>Raio da Terra R (m) <input id="raio" inputmode="decimal" autocomplete="off"></label>
+          <label>Coeficiente de refração k <input id="coef-k" inputmode="decimal" autocomplete="off"></label>
+        </form>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-cad">
+        <h2 id="t-cad"><span class="numero">2</span> Caderneta</h2>
+        <p class="nota" id="ajuda-caderneta"></p>
+        <div class="barra-acoes nao-imprimir">
+          <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
+          <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
+          <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
+        </div>
+        <div class="rolagem-tabela" id="caderneta"></div>
+        <p class="nota">Ângulos em 91°19'40", 91 19 40 ou graus decimais. Para excluir uma linha, use o × no fim dela. O rascunho fica salvo só neste navegador; para guardar ou levar a outro computador, use "Salvar projeto (.niv)".</p>
+      </section>
+
+      <section class="bloco" aria-labelledby="t-res" aria-live="polite">
+        <h2 id="t-res"><span class="numero">3</span> Resultados</h2>
+        <div id="mensagens" class="mensagens"></div>
+        <div data-modos="poligonal">
+          <div class="grade-resumo grade-fechamento">
+            <div class="cartao-resumo"><h3>Fechamento</h3><div id="fechamento"></div></div>
+            <div class="cartao-resumo"><h3>Tolerância — NBR 13133:2021, Tabela 6</h3><div id="tolerancias"></div></div>
+          </div>
+        </div>
+        <div class="grade-resumo grade-fechamento">
+          <div class="cartao-resumo"><h3>Parâmetros do cálculo</h3><div id="parametros"></div></div>
+          <div class="cartao-resumo"><h3>Distâncias</h3><div id="distancias"></div></div>
+        </div>
+        <h3 class="subtitulo"><span data-altura>Cota</span>s calculadas</h3>
+        <div class="rolagem-tabela" id="tabela-pontos"></div>
+      </section>
     </div>
   </main>
   <div id="rodape"></div>

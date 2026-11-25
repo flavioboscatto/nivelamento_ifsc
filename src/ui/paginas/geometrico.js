@@ -6,9 +6,11 @@ import { classeDoNivel } from '../../core/tolerancias.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
 import { perfilSvg } from '../perfil_svg.js';
+import { criarProjeto, serializarProjeto, lerProjeto, nomeArquivo } from '../../io/projeto.js';
 
 const CHAVE_RASCUNHO = 'nivelamento-ifsc.geometrico.v2';
 const CHAVE_ANTIGA = 'nivelamento-ifsc.geometrico.v1';
+const CHAVE_TIPO_ALTURA = 'nivelamento-ifsc.tipoAltura'; // escolha vale para o site todo
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const $ = (id) => document.getElementById(id);
 const lerJson = (rel) => fetch(new URL(rel, import.meta.url)).then((r) => {
@@ -18,7 +20,7 @@ const lerJson = (rel) => fetch(new URL(rel, import.meta.url)).then((r) => {
 
 const MODOS = {
   irradiacao: {
-    descricao: 'De uma estação: ré no ponto de altura conhecida e vantes intermediárias nos pontos de detalhe. Não há fechamento; recomenda-se visar também um ponto de controle.',
+    descricao: 'De uma estação: ré no ponto conhecido e leituras nos pontos irradiados (detalhes). Não há fechamento; recomenda-se visar também um ponto de controle.',
     exemplo: 'nbr_f2.json', rotuloExemplo: 'Exemplo NBR F.2',
   },
   transporte: {
@@ -26,7 +28,7 @@ const MODOS = {
     exemplo: 'aa_ex1_transporte.json', rotuloExemplo: 'Exemplo AA Ex. I',
   },
   circuito: {
-    descricao: 'Parte e chega na mesma RN. K = perímetro (soma das DH de ré e de vante de mudança; as intermediárias não entram).',
+    descricao: 'Parte e chega na mesma RN. K = perímetro (soma das DH de ré e de vante de mudança; os irradiados não entram).',
     exemplo: 'aa_tab9_circuito.json', rotuloExemplo: 'Exemplo AA Tab. 9',
   },
   linha: {
@@ -38,9 +40,13 @@ const MODOS = {
 const COLUNAS = [
   { id: 'estacao', rotulo: 'Estação', classe: 'curta' },
   { id: 'ponto', rotulo: 'Ponto' },
+  {
+    id: 'status', rotulo: 'Status', titulo: 'Ré, Vante ou Irad. — trocar o status move a leitura de coluna',
+    opcoes: [['', '—'], ['re', 'Ré'], ['vante', 'Vante'], ['irradiado', 'Irad.']], moverEntre: ['re', 'vante', 'irradiado'],
+  },
   { id: 're', rotulo: 'Ré (m)', numero: true, titulo: 'Leitura de ré (fio médio)' },
   { id: 'vante', rotulo: 'Vante (m)', numero: true, titulo: 'Vante de mudança ou ponto final' },
-  { id: 'intermediaria', rotulo: 'Intermed. (m)', numero: true, titulo: 'Vante intermediária (ponto irradiado)' },
+  { id: 'irradiado', rotulo: 'Irad. (m)', numero: true, titulo: 'Leitura em ponto irradiado' },
   { id: 'fs', rotulo: 'FS (m)', numero: true, titulo: 'Fio superior (opcional)' },
   { id: 'fi', rotulo: 'FI (m)', numero: true, titulo: 'Fio inferior (opcional)' },
   { id: 'dh', rotulo: 'DH (m)', numero: true, titulo: 'Distância horizontal. Vazia: calculada pelos três fios (estadimetria)' },
@@ -48,10 +54,10 @@ const COLUNAS = [
 ];
 const CALCULADAS = [
   { id: 'apv', rotulo: 'APV (m)', titulo: 'Altura do plano de visada' },
-  { id: 'H', rotulo: 'Altura (m)', titulo: 'Altura calculada (antes da distribuição do erro)' },
+  { id: 'H', rotulo: 'Cota (m)', titulo: 'Valor calculado (antes da distribuição do erro)' },
   { id: 'corr', rotulo: 'Correção (m)', titulo: 'Parcela do erro de fechamento distribuída ao ponto' },
-  { id: 'Hc', rotulo: 'Altura corr. (m)', titulo: 'Altura corrigida' },
-  { id: 'sigma', rotulo: 'σ (mm)', titulo: 'Desvio-padrão da altura' },
+  { id: 'Hc', rotulo: 'Cota corr. (m)', titulo: 'Valor corrigido' },
+  { id: 'sigma', rotulo: 'σ (mm)', titulo: 'Desvio-padrão' },
   { id: 'difRV', rotulo: 'Ré − vante (m)', titulo: 'DH ré − DH vante (equidistância)' },
   { id: 'acum', rotulo: 'Dist. acum. (m)', titulo: 'Distância acumulada até o ponto' },
   { id: 'situacao', rotulo: 'Situação' },
@@ -62,9 +68,30 @@ let modo = 'irradiacao';
 let rascunho = { modo, porModo: {} };
 let carregando = false;
 
+// ---------- Cota ou altitude (escolha do início da página) ----------
+const tipoAltura = () => document.querySelector('input[name="tipo-altura"]:checked')?.value || 'cota';
+const rotAltura = () => (tipoAltura() === 'altitude_normal' ? 'Altitude' : 'Cota');
+
+function definirTipoAltura(t) {
+  const r = document.querySelector(`input[name="tipo-altura"][value="${t === 'altitude_normal' ? 'altitude_normal' : 'cota'}"]`);
+  if (r) r.checked = true;
+  aplicarRotulosAltura();
+}
+
+function aplicarRotulosAltura() {
+  const rot = rotAltura();
+  document.querySelectorAll('[data-altura]').forEach((el) => { el.textContent = rot; });
+  document.querySelectorAll('[data-altura-min]').forEach((el) => { el.textContent = rot === 'Cota' ? 'cotas' : 'altitudes'; });
+  if (caderneta) {
+    caderneta.renomearColuna('H', `${rot} (m)`);
+    caderneta.renomearColuna('Hc', `${rot} corr. (m)`);
+  }
+  try { localStorage.setItem(CHAVE_TIPO_ALTURA, tipoAltura()); } catch { /* sem armazenamento */ }
+}
+
 // ---------- Cabeçalho ----------
 const CAMPOS = {
-  pontoRef: 'ref-ponto', H_ref: 'ref-h', sigmaRef_mm: 'ref-sigma', tipoAltura: 'tipo-altura', instrumento: 'instrumento',
+  pontoRef: 'ref-ponto', H_ref: 'ref-h', sigmaRef_mm: 'ref-sigma', instrumento: 'instrumento',
   sigmaLeitura_mm: 'sigma-leitura', distanciaRef_m: 'dist-ref', sigmaKm_mm: 'sigma-km',
   tol3fios_mm: 'tol-3fios', difReVanteMax_m: 'dif-rv',
   pontoChegada: 'cheg-ponto', H_chegada: 'cheg-h', sigmaChegada_mm: 'cheg-sigma',
@@ -132,6 +159,7 @@ function recalcular() {
     classes: norma.geometrico,
     classeId: cab.classe,
     classeNivel: classeNivel?.classe ?? null,
+    nomeAltura: rotAltura().toLowerCase(),
   });
 
   const f = r.fechamento;
@@ -174,13 +202,15 @@ function textoDistribuicao(cab, f) {
 }
 
 function textoPropagacao() {
-  if (modo === 'irradiacao') return 'NBR 13133:2021, Anexo F.1 (vantes); F.1 sem simplificação (intermediárias). σ por km mostrado como referência.';
+  if (modo === 'irradiacao') return 'NBR 13133:2021, Anexo F.1 (vantes); F.1 sem simplificação (irradiados). σ por km mostrado como referência.';
   const forma = { transporte: 'circuito (4.3.6 a) nos pontos; média ida/volta (4.3.6 c) na RN de chegada', circuito: 'circuito fechado (4.3.6 a)', linha: 'linha entre duas RN (4.3.6 b)' }[modo];
   return `Rigorosa, combinando os dois sentidos — ${forma}; variância por estação pela NBR F.1. Anexo L (modo simplificado da norma) e σ por km mostrados ao lado.`;
 }
 
+const rotAltura_ = () => rotAltura();
+
 function mostrarResultados(r, cab, avisosCab, classeNivel) {
-  const rotAltura = cab.tipoAltura === 'altitude_normal' ? 'Altitude normal' : 'Cota';
+  const rotAltura = rotAltura_();
   const ins = instrumentos.niveis.find((n) => n.id === cab.instrumento);
   const f = r.fechamento;
   const classeEsc = norma.geometrico.find((c) => c.id === cab.classe);
@@ -190,7 +220,7 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
       <div><dt>Norma</dt><dd>${esc(norma.rotulo)}</dd></div>
       <div><dt>Método</dt><dd>${esc(nomeMetodo(modo))}${modo !== 'irradiacao' && classeEsc ? `<br>Classe ${esc(classeEsc.rotulo)}` : ''}</dd></div>
       <div><dt>Nível</dt><dd>${esc(ins ? ins.rotulo : '—')}${classeNivel ? `<br>${esc(classeNivel.rotulo)}` : ''}</dd></div>
-      <div><dt>Tipo de altura</dt><dd>${rotAltura}${cab.tipoAltura === 'altitude_normal' ? ' (referida ao SGB)' : ' (referência arbitrária)'}</dd></div>
+      <div><dt>Trabalhando com</dt><dd>${tipoAltura() === 'altitude_normal' ? 'Altitude normal (referida ao SGB)' : 'Cota (referência arbitrária)'}</dd></div>
       <div><dt>Distribuição do erro</dt><dd>${esc(textoDistribuicao(cab, f))}</dd></div>
       <div><dt>Propagação</dt><dd>${esc(textoPropagacao())}</dd></div>
     </dl>`;
@@ -236,7 +266,7 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
         <th scope="col" class="n">σ por km (mm)<br><small>referência</small></th><th scope="col" class="n">Dist. acum. (m)</th></tr></thead>
       <tbody>${pts.map((p) => `<tr>
         <th scope="row">${esc(p.ponto)}</th><td>${esc(p.estacao)}</td>
-        <td>${{ re: 'Partida', vante: 'Vante', intermediaria: 'Intermediária' }[p.tipo]}</td>
+        <td>${{ re: 'Partida', vante: 'Vante', irradiado: 'Irradiado' }[p.tipo]}</td>
         <td class="n">${f3(p.H)}</td>
         ${comF ? `<td class="n">${Number.isFinite(p.correcao) ? formatarComSinal(p.correcao, 4) : '—'}</td>
           <td class="n"><strong>${Number.isFinite(p.correcao) ? f3(p.Hcorr) : '—'}</strong></td>
@@ -251,12 +281,12 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
     <table class="tabela-resultado">
       <thead><tr><th scope="col">Estação</th><th scope="col">Ré</th><th scope="col" class="n">DH ré (m)</th>
         <th scope="col">Vante</th><th scope="col" class="n">DH vante (m)</th><th scope="col" class="n">Ré − vante (m)</th>
-        <th scope="col" class="n">Lance (m)</th><th scope="col" class="n">APV (m)</th><th scope="col" class="n">Intermed.</th></tr></thead>
+        <th scope="col" class="n">Lance (m)</th><th scope="col" class="n">APV (m)</th><th scope="col" class="n">Irad.</th></tr></thead>
       <tbody>${r.estacoes.map((e) => `<tr>
         <th scope="row">${esc(e.rotulo)}</th><td>${esc(e.rePonto)}</td><td class="n">${formatar(e.dhRe, 3)}</td>
         <td>${esc(e.vantePonto ?? '—')}</td><td class="n">${formatar(e.dhVante, 3)}</td>
         <td class="n">${Number.isFinite(e.difReVante) ? formatarComSinal(e.difReVante, 3) : ''}</td>
-        <td class="n">${formatar(e.lance, 3)}</td><td class="n">${f3(e.apv)}</td><td class="n">${e.intermediarias}</td></tr>`).join('')}</tbody>
+        <td class="n">${formatar(e.lance, 3)}</td><td class="n">${f3(e.apv)}</td><td class="n">${e.irradiados}</td></tr>`).join('')}</tbody>
     </table>` : '';
 
   // Mensagens
@@ -274,6 +304,7 @@ function mostrarResultados(r, cab, avisosCab, classeNivel) {
 
 function mostrarFechamento(f) {
   if (!f) return;
+  const rot = rotAltura();
   if (!f.calculado) {
     $('fechamento').innerHTML = `<p class="status neutro">${esc(f.motivo || 'Ainda não calculado.')}</p>`;
     $('tolerancias').innerHTML = '';
@@ -284,8 +315,8 @@ function mostrarFechamento(f) {
   const cl = f.classe;
   $('fechamento').innerHTML = `
     <dl class="lista-def">
-      <div><dt>Altura calculada no fecho (${esc(f.pontoFecho)})</dt><dd>${f3(f.Hfecho)} m</dd></div>
-      <div><dt>Altura conhecida</dt><dd>${f3(f.Hconhecida)} m</dd></div>
+      <div><dt>${rot} calculada no fecho (${esc(f.pontoFecho)})</dt><dd>${f3(f.Hfecho)} m</dd></div>
+      <div><dt>${rot} conhecida</dt><dd>${f3(f.Hconhecida)} m</dd></div>
       <div><dt>Erro de fechamento e</dt><dd>${formatarComSinal(e_mm, 1)} mm</dd></div>
       <div><dt>K (extensão em um sentido)</dt><dd>${Number.isFinite(f.K_km) ? `${formatar(f.K_km, 4)} km` : '—'}</dd></div>
       <div><dt>σ esperado do fechamento</dt><dd>${fmm(f.sigmaEsperado_m) || '—'} mm${Number.isFinite(f.sigmaEsperadoKm_m) ? ` (por km: ${fmm(f.sigmaEsperadoKm_m)})` : ''}</dd></div>
@@ -317,6 +348,7 @@ function mostrarFechamento(f) {
 // ---------- Rascunho e modos ----------
 function salvarRascunho(cab, linhas) {
   rascunho.modo = modo;
+  rascunho.nome = $('nome-projeto').value;
   rascunho.porModo[modo] = { cabecalho: cab, linhas };
   try { localStorage.setItem(CHAVE_RASCUNHO, JSON.stringify(rascunho)); } catch { /* sem armazenamento */ }
 }
@@ -363,6 +395,38 @@ function trocarModo(novo) {
   caderneta.definirLinhas(salvo?.linhas ?? []);
 }
 
+// ---------- Projeto em arquivo (.niv) ----------
+function salvarProjeto() {
+  const p = criarProjeto({
+    nome: $('nome-projeto').value.trim(), tipoAltura: tipoAltura(), modulo: 'geometrico', modo,
+    cabecalho: lerCabecalho(), linhas: caderneta.obterLinhas(),
+  });
+  const blob = new Blob([serializarProjeto(p)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = nomeArquivo(p.nome, modo);
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function abrirProjeto(ev) {
+  const arq = ev.target.files?.[0];
+  ev.target.value = '';
+  if (!arq) return;
+  const r = lerProjeto(await arq.text(), { modulo: 'geometrico' });
+  if (!r.ok) { alert(r.erro); return; }
+  const p = r.projeto;
+  salvarRascunho(lerCabecalho(), caderneta.obterLinhas());
+  modo = MODOS[p.modo] ? p.modo : 'irradiacao';
+  $('nome-projeto').value = p.nome || '';
+  definirTipoAltura(p.tipoAltura);
+  definirCabecalho({ pontoChegada: '', H_chegada: '', sigmaChegada_mm: '', ...p.cabecalho });
+  mostrarModo();
+  caderneta.definirLinhas(p.linhas);
+}
+
 async function iniciar() {
   try {
     [norma, instrumentos] = await Promise.all([
@@ -384,6 +448,15 @@ async function iniciar() {
   caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: COLUNAS, calculadas: CALCULADAS, aoMudar: recalcular });
 
   rascunho = lerRascunho();
+  let tipoSalvo = 'cota';
+  try { tipoSalvo = localStorage.getItem(CHAVE_TIPO_ALTURA) || 'cota'; } catch { /* sem armazenamento */ }
+  definirTipoAltura(tipoSalvo);
+  $('nome-projeto').value = rascunho.nome || '';
+  document.querySelectorAll('input[name="tipo-altura"]').forEach((r) => r.addEventListener('change', () => { aplicarRotulosAltura(); recalcular(); }));
+  $('nome-projeto').addEventListener('input', () => salvarRascunho(lerCabecalho(), caderneta.obterLinhas()));
+  $('bt-salvar').addEventListener('click', salvarProjeto);
+  $('bt-abrir').addEventListener('click', () => $('arquivo-projeto').click());
+  $('arquivo-projeto').addEventListener('change', abrirProjeto);
   modo = MODOS[rascunho.modo] ? rascunho.modo : 'irradiacao';
   const salvo = rascunho.porModo[modo];
   if (salvo) definirCabecalho(salvo.cabecalho);
@@ -398,7 +471,6 @@ async function iniciar() {
   if (salvo?.linhas?.length) caderneta.definirLinhas(salvo.linhas); else recalcular();
 
   $('bt-adicionar').addEventListener('click', () => caderneta.adicionarLinha());
-  $('bt-remover').addEventListener('click', () => caderneta.removerLinha());
   $('bt-limpar').addEventListener('click', () => {
     if (confirm('Apagar todas as linhas da caderneta? O cabeçalho é mantido.')) caderneta.definirLinhas([]);
   });

@@ -19,7 +19,7 @@ Fontes: apostilas *Introdução à Altimetria* (IA) e *Altimetria Aplicada* (AA)
 | Ré | Leitura em ponto de altura conhecida | `re` |
 | Vante | Leitura em ponto de altura a determinar | `vante` |
 | Vante de mudança | Vante que será ré na estação seguinte | `tipo='mudanca'` |
-| Intermediária | Vante de detalhe (não é mudança) | `tipo='intermediaria'` |
+| Irradiado (Irad.) | Ponto de detalhe visado da estação (não é mudança); nas apostilas, "vante intermediária" | `tipo='irradiado'` |
 
 **Regra de projeto:** o programa sempre informa se o resultado é **cota** (referência arbitrária) ou **altitude** (referência oficial). A escolha é do usuário no cabeçalho do levantamento.
 

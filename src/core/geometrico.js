@@ -33,10 +33,10 @@ export function sigmaVanteF1(sigmaRe, sigmaL, dhRe, dhVante) {
 }
 
 /**
- * σ de uma vante intermediária — F.1 sem simplificação (doc 4, 4.3.1 e 4.3.6 d; D27):
+ * σ de um ponto irradiado — F.1 sem simplificação (doc 4, 4.3.1 e 4.3.6 d; D27):
  *   σI² = σR² + (σL · DHré)² + (σL · DHI)²
  */
-export function sigmaIntermediaria(sigmaRe, sigmaL, dhRe, dhPonto) {
+export function sigmaIrradiado(sigmaRe, sigmaL, dhRe, dhPonto) {
   return Math.sqrt(sigmaRe ** 2 + (sigmaL * dhRe) ** 2 + (sigmaL * dhPonto) ** 2);
 }
 
@@ -54,20 +54,22 @@ export const sigmaLeituraPorMetro = (sigmaLeitura_mm, distanciaRef_m) => sigmaLe
 /**
  * Calcula a caderneta.
  *
- * @param {Array<object>} linhas  [{ estacao, ponto, re, vante, intermediaria, fs, fi, dh, obs }]
+ * @param {Array<object>} linhas  [{ estacao, ponto, re, vante, irradiado, fs, fi, dh, obs }]
  *   Valores podem ser texto (vírgula ou ponto) ou número. Uma linha com leitura de ré abre
  *   uma nova estação. Cada estação tem uma ré, uma vante (mudança ou final) opcional e
- *   quantas intermediárias forem necessárias.
+ *   quantos pontos irradiados forem necessários.
  * @param {object} op
  *   H_ref, sigmaRef_m, pontoRef — altura conhecida do ponto de ré da primeira estação;
  *   sigmaL — σ da leitura por metro de visada (m/m), NBR F.1;
  *   sigmaKm_m — σ por km de duplo nivelamento (m/√km), opcional, só como referência;
- *   C (100), tol3fios_m, difReVanteMax_m, visadaMax_m, alturaMin_m — limites dos alertas.
+ *   C (100), tol3fios_m, difReVanteMax_m, visadaMax_m, alturaMin_m — limites dos alertas;
+ *   nomeAltura — 'cota' ou 'altitude', usado nas mensagens.
  */
 export function calcularCaderneta(linhas, op = {}) {
   const {
     H_ref, sigmaRef_m = 0, pontoRef = '', sigmaL = null, sigmaKm_m = null,
     C = 100, tol3fios_m = 0.002, difReVanteMax_m = 10, visadaMax_m = 80, alturaMin_m = 0.30,
+    nomeAltura = 'cota', // 'cota' ou 'altitude' — só para as mensagens
   } = op;
 
   const erros = [];
@@ -77,8 +79,8 @@ export function calcularCaderneta(linhas, op = {}) {
   const conhecidos = new Map(); // ponto → { H, sigma, sigmaKm, acum }
 
   const Href = lerCampo(H_ref);
-  if (!Href.presente) erros.push('Informe a altura (cota ou altitude) do ponto de referência.');
-  else if (Href.invalido) erros.push(`A altura do ponto de referência "${H_ref}" não é um número.`);
+  if (!Href.presente) erros.push(`Informe a ${nomeAltura} do ponto de referência.`);
+  else if (Href.invalido) erros.push(`A ${nomeAltura} do ponto de referência "${H_ref}" não é um número.`);
   const temRef = Href.presente && !Href.invalido;
   if (temRef && pontoRef) conhecidos.set(String(pontoRef).trim(), { H: Href.valor, sigma: sigmaRef_m, sigmaKm: sigmaRef_m, acum: 0 });
 
@@ -86,7 +88,7 @@ export function calcularCaderneta(linhas, op = {}) {
   let rotuloAnterior = '';
 
   linhas.forEach((bruta, i) => {
-    const campos = ['re', 'vante', 'intermediaria', 'fs', 'fi', 'dh'];
+    const campos = ['re', 'vante', 'irradiado', 'fs', 'fi', 'dh'];
     const ponto = vazio(bruta.ponto) ? '' : String(bruta.ponto).trim();
     const rotuloDigitado = vazio(bruta.estacao) ? '' : String(bruta.estacao).trim();
     const todosVazios = !ponto && !rotuloDigitado && campos.every((c) => vazio(bruta[c])) && vazio(bruta.obs);
@@ -104,7 +106,7 @@ export function calcularCaderneta(linhas, op = {}) {
     const alerta = (msg) => { L.alertas.push(msg); alertas.push(`${nome()}: ${msg}`); };
 
     // Tipo da linha pela coluna preenchida
-    const leituras = ['re', 'vante', 'intermediaria'].filter((k) => c[k].presente);
+    const leituras = ['re', 'vante', 'irradiado'].filter((k) => c[k].presente);
     if (leituras.length > 1) {
       L.tipo = leituras[0];
     } else if (leituras.length === 1) {
@@ -118,7 +120,7 @@ export function calcularCaderneta(linhas, op = {}) {
         n: estacoes.length + 1, rotulo: rot, rePonto: ponto, linhaRe: L.linha,
         Hre: NaN, sigmaRe: NaN, sigmaKmRe: NaN, acumRe: NaN, apv: NaN, re: NaN,
         dhRe: NaN, dhVante: NaN, difReVante: NaN, lance: NaN, vantePonto: null, vante: NaN, Hvante: NaN,
-        encadeada: false, intermediarias: 0,
+        encadeada: false, irradiados: 0,
       };
       estacoes.push(estAtual);
       rotuloAnterior = rot;
@@ -132,22 +134,22 @@ export function calcularCaderneta(linhas, op = {}) {
     if (estAtual) { L.estacao = estAtual.rotulo; L.nEstacao = estAtual.n; }
 
     if (!estAtual) {
-      erro('a caderneta deve começar com uma leitura de ré no ponto de altura conhecida.');
+      erro(`a caderneta deve começar com uma leitura de ré no ponto de ${nomeAltura} conhecida.`);
       saida.push(L);
       return;
     }
     if (leituras.length > 1) {
-      erro('preencha só uma leitura por linha (ré, vante ou intermediária).');
+      erro('preencha só uma leitura por linha (ré, vante ou irradiado).');
       saida.push(L);
       return;
     }
     if (leituras.length === 0) {
-      erro('a leitura na mira está vazia (ré, vante ou intermediária).');
+      erro('a leitura na mira está vazia (ré, vante ou irradiado).');
       saida.push(L);
       return;
     }
 
-    const nomesColuna = { re: 'ré', vante: 'vante', intermediaria: 'intermediária' };
+    const nomesColuna = { re: 'ré', vante: 'vante', irradiado: 'irradiado' };
     const cl = c[L.tipo];
     if (cl.invalido) { erro(`a leitura de ${nomesColuna[L.tipo]} "${bruta[L.tipo]}" não é um número.`); saida.push(L); return; }
     L.leitura = cl.valor;
@@ -190,7 +192,7 @@ export function calcularCaderneta(linhas, op = {}) {
       if (est.n === 1) {
         if (temRef) base = { H: Href.valor, sigma: sigmaRef_m, sigmaKm: sigmaRef_m, acum: 0 };
         if (temRef && pontoRef && ponto && ponto !== String(pontoRef).trim()) {
-          alerta(`a ré da primeira estação foi lida em "${ponto}", mas o ponto de referência informado é "${pontoRef}". Usada a altura do ponto de referência.`);
+          alerta(`a ré da primeira estação foi lida em "${ponto}", mas o ponto de referência informado é "${pontoRef}". Usada a ${nomeAltura} do ponto de referência.`);
         }
       } else {
         const ant = estacoes[est.n - 2];
@@ -206,7 +208,7 @@ export function calcularCaderneta(linhas, op = {}) {
           est.encadeada = true;
           alerta(`o ponto de ré "${ponto}" não é a vante da estação anterior ("${ant.vantePonto}"). Usada a vante anterior, pela ordem da caderneta.`);
         } else if (ant.vantePonto === null) {
-          erro(`o ponto de ré "${ponto}" não tem altura conhecida: a estação ${ant.rotulo} não tem vante de mudança.`);
+          erro(`o ponto de ré "${ponto}" não tem ${nomeAltura} conhecida: a estação ${ant.rotulo} não tem vante de mudança.`);
         }
       }
       if (base) {
@@ -220,9 +222,9 @@ export function calcularCaderneta(linhas, op = {}) {
       return;
     }
 
-    // Vante ou intermediária
+    // Vante ou irradiado
     if (L.tipo === 'vante' && est.vantePonto !== null) {
-      erro(`a estação ${est.rotulo} já tem uma vante (${est.vantePonto}). Use a coluna "intermediária" para pontos irradiados ou abra nova estação com uma leitura de ré.`);
+      erro(`a estação ${est.rotulo} já tem uma vante (${est.vantePonto}). Use o status "Irad." para pontos irradiados ou abra nova estação com uma leitura de ré.`);
       saida.push(L);
       return;
     }
@@ -234,7 +236,7 @@ export function calcularCaderneta(linhas, op = {}) {
     if (Number.isFinite(L.H)) {
       if (temDh && sigmaL !== null && Number.isFinite(est.sigmaRe)) {
         if (L.tipo === 'vante') { L.sigma = sigmaVanteF1(est.sigmaRe, sigmaL, est.dhRe, L.dh); L.sigmaForma = 'F.1'; }
-        else { L.sigma = sigmaIntermediaria(est.sigmaRe, sigmaL, est.dhRe, L.dh); L.sigmaForma = 'F.1 sem simplificação'; }
+        else { L.sigma = sigmaIrradiado(est.sigmaRe, sigmaL, est.dhRe, L.dh); L.sigmaForma = 'F.1 sem simplificação'; }
       }
       if (temDh && sigmaKm_m !== null && Number.isFinite(est.sigmaKmRe)) {
         L.sigmaKm = sigmaPorKm(est.sigmaKmRe, sigmaKm_m, est.dhRe, L.dh);
@@ -260,7 +262,7 @@ export function calcularCaderneta(linhas, op = {}) {
         }
       }
     } else {
-      est.intermediarias += 1;
+      est.irradiados += 1;
     }
     if (ponto && Number.isFinite(L.H)) conhecidos.set(ponto, { H: L.H, sigma: L.sigma, sigmaKm: L.sigmaKm, acum: L.distAcum });
     saida.push(L);
@@ -269,13 +271,13 @@ export function calcularCaderneta(linhas, op = {}) {
   // ---------- Resumo ----------
   const comVante = estacoes.filter((e) => e.vantePonto !== null);
   const extensao_m = comVante.every((e) => Number.isFinite(e.lance)) ? comVante.reduce((a, e) => a + e.lance, 0) : NaN;
-  const temIntermediarias = estacoes.some((e) => e.intermediarias > 0);
+  const temIrradiados = estacoes.some((e) => e.irradiados > 0);
 
   if (comVante.length >= 2 && comVante.length % 2 === 1) {
     alertas.push(`Número de lances ímpar (${comVante.length}). A NBR 13133:2021, 5.5.2.3, recomenda número par de lances (mesma mira na partida e na chegada).`);
   }
-  if (temIntermediarias) {
-    alertas.push('Pontos irradiados (intermediárias) não têm verificação de fechamento. Recomenda-se visar também um ponto de altura conhecida como controle.');
+  if (temIrradiados) {
+    alertas.push(`Pontos irradiados não têm verificação de fechamento. Recomenda-se visar também um ponto de ${nomeAltura} conhecida como controle.`);
   }
 
   // Verificação aritmética: Σ ré − Σ vante = H final − H inicial (doc 2, 2.2.3)

@@ -18,18 +18,18 @@
     },
     {
       "ponto": "1",
-      "intermediaria": "1,175",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,175"
     },
     {
       "ponto": "2",
-      "intermediaria": "1,692",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,692"
     },
     {
       "ponto": "3",
-      "intermediaria": "1,595",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,595"
     },
     {
       "ponto": "A1",
@@ -44,13 +44,13 @@
     },
     {
       "ponto": "4",
-      "intermediaria": "0,899",
-      "dh": ""
+      "dh": "",
+      "irradiado": "0,899"
     },
     {
       "ponto": "5",
-      "intermediaria": "0,807",
-      "dh": ""
+      "dh": "",
+      "irradiado": "0,807"
     },
     {
       "ponto": "A2",
@@ -65,18 +65,18 @@
     },
     {
       "ponto": "6",
-      "intermediaria": "1,128",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,128"
     },
     {
       "ponto": "7",
-      "intermediaria": "1,508",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,508"
     },
     {
       "ponto": "8",
-      "intermediaria": "1,799",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,799"
     },
     {
       "ponto": "A3",
@@ -91,13 +91,13 @@
     },
     {
       "ponto": "9",
-      "intermediaria": "1,500",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,500"
     },
     {
       "ponto": "10",
-      "intermediaria": "1,678",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,678"
     },
     {
       "ponto": "PS1",
@@ -112,18 +112,18 @@
     },
     {
       "ponto": "11",
-      "intermediaria": "1,500",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,500"
     },
     {
       "ponto": "12",
-      "intermediaria": "1,678",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,678"
     },
     {
       "ponto": "13",
-      "intermediaria": "1,462",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,462"
     },
     {
       "ponto": "A4",
@@ -138,18 +138,18 @@
     },
     {
       "ponto": "14",
-      "intermediaria": "1,500",
-      "dh": "12,356"
+      "dh": "12,356",
+      "irradiado": "1,500"
     },
     {
       "ponto": "15",
-      "intermediaria": "1,500",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,500"
     },
     {
       "ponto": "16",
-      "intermediaria": "1,678",
-      "dh": ""
+      "dh": "",
+      "irradiado": "1,678"
     },
     {
       "ponto": "A5",

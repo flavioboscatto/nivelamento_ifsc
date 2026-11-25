@@ -161,10 +161,11 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Teste manual:** resolver Exercícios I–IV da AA na tela e comparar com as respostas.
 - **Feito:** caderneta contínua por modo (transporte = ida até a RN de chegada e volta à partida; K = ida); erro, K, T = t√K nas três classes da Tabela 5 com "Atende/Não atende" em texto; distribuição proporcional (padrão, D23) e por estação (didática, com opção de arredondar C — errata E2); σ rigoroso (4.3.6) com Anexo L e σ por km ao lado (D24, D25); RN de chegada do transporte também pela média ida/volta (4.3.6 c); |e|/σ esperado (4.3.3). G02 e G03 não têm dados no repositório (só tolerâncias testadas). Seções com PS: uma caderneta por seção.
 
-### Etapa 5 — Trigonométrico
+### Etapa 5 — Trigonométrico — *concluída em 25/11/2026 (50 testes), aguardando teste manual*
 - **Objetivo:** irradiação com Di ou DH; PD/PI; c+r automático por limiar; recíprocas; poligonal altimétrica com fechamento II N; σ (F.3 e forma geral).
 - **Aceite:** T01 e T03 conferem; T02 (Anexo H) reproduz ΔH = 3,943 m e f = 3 mm.
 - **Teste manual:** caderneta da Tabela F.2 e Anexo I.
+- **Feito:** caderneta com estação sobre ponto (i) ou estação livre (ré); Z PD/PI; Di ou DH; c+r sempre calculado e aplicado acima de 125 m (editável); σ por visada pela forma geral (4.4.2), igual à F.3 com estação sobre ponto; poligonal fechada ou entre pontos conhecidos, tolerância 120√K / 200√K, distribuição proporcional, σ rigoroso e Anexo L; visadas recíprocas com controle ida + volta ≈ −2·(c+r). T02 (Anexo H) sem dados no repositório; T03 aceita 1 mm na 3ª visada (errata E11).
 
 ### Etapa 6 — Taqueometria e estadimetria
 - **Aceite:** E01 = 9,395 m; Q01 conferido pelo professor.
@@ -218,6 +219,10 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 | D26 | Alertas: 3 fios com tolerância de 2 mm; diferença ré−vante acima de 10 m (editáveis) | 25/11/2026 |
 | D27 | σ de vantes intermediárias com ré e vante separadas; NBR F.1 quando equidistantes | 25/11/2026 |
 | D28 | Nome/endereço provisório: **nivelamentoifsc** no Netlify (`nivelamentoifsc.netlify.app`) | 25/11/2026 |
+| D29 | Status dos pontos: Ré, Vante e Irradiado ("Irad."); cada linha da caderneta tem uma lista de status que move a leitura de coluna (dados do nível vêm sem código) | 25/11/2026 |
+| D30 | Cota ou Altitude escolhida no início da página; rótulos e mensagens seguem a escolha | 25/11/2026 |
+| D31 | Projeto salvo/aberto em arquivo `.niv` (JSON próprio, versionado) | 25/11/2026 |
+| D32 | Página "Sobre a norma": só a indicação das seções de onde saíram as fórmulas de cálculo e de propagação | 25/11/2026 |
 
 ### 1.5.2 Decisões pendentes
 

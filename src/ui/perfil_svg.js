@@ -44,7 +44,7 @@ export function perfilSvg(pontos, { rotuloAltura = 'Altura (m)' } = {}) {
   const linha = ps.map((p) => `${px(p.distAcum).toFixed(1)},${py(p.H).toFixed(1)}`).join(' ');
   const marcas = ps.map((p) => `
     <g class="ponto ${p.tipo}">
-      <circle cx="${px(p.distAcum)}" cy="${py(p.H)}" r="${p.tipo === 'intermediaria' ? 3.5 : 5}"/>
+      <circle cx="${px(p.distAcum)}" cy="${py(p.H)}" r="${p.tipo === 'irradiado' ? 3.5 : 5}"/>
       <text x="${px(p.distAcum)}" y="${py(p.H) - 10}" text-anchor="middle">${esc(p.ponto)}</text>
       <title>${esc(p.ponto)}: ${formatar(p.H, 3)} m a ${formatar(p.distAcum, 1)} m</title>
     </g>`).join('');
