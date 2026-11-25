@@ -43,7 +43,7 @@
         <button type="button" class="aba" role="tab" data-modo="irradiacao">Irradiação</button>
         <button type="button" class="aba" role="tab" data-modo="poligonal">Poligonal altimétrica</button>
         <button type="button" class="aba" role="tab" data-modo="reciprocas">Visadas recíprocas</button>
-        <span class="aba inativa" title="Etapa 6 do plano">Taqueometria <small>em breve</small></span>
+        <button type="button" class="aba" role="tab" data-modo="taqueometria">Taqueometria</button>
       </div>
       <p class="nota" id="descricao-modo"></p>
 
@@ -53,25 +53,29 @@
           <label>Ponto de referência <input id="ref-ponto" autocomplete="off" placeholder="ex.: E01"></label>
           <label><span><span data-altura>Cota</span> da referência (m)</span> <input id="ref-h" inputmode="decimal" autocomplete="off"></label>
           <label>σ da referência (mm) <input id="ref-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+          <label data-modos="taqueometria">X da estação (m) <input id="ref-x" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
+          <label data-modos="taqueometria">Y da estação (m) <input id="ref-y" inputmode="decimal" autocomplete="off" placeholder="opcional"></label>
+          <label data-modos="taqueometria">Azimute da direção Hz = 0 <input id="az-ref" autocomplete="off" placeholder="0°00'00&quot;"></label>
+          <label data-modos="taqueometria">σ da leitura na mira (mm) <input id="sigma-leit" inputmode="decimal" autocomplete="off"></label>
           <label data-modos="poligonal">Ponto de chegada <input id="cheg-ponto" autocomplete="off" placeholder="vazio = fecha na referência"></label>
           <label data-modos="poligonal"><span><span data-altura>Cota</span> do ponto de chegada (m)</span> <input id="cheg-h" inputmode="decimal" autocomplete="off"></label>
           <label data-modos="poligonal">σ do ponto de chegada (mm) <input id="cheg-sigma" inputmode="decimal" autocomplete="off" placeholder="0"></label>
           <label class="largo" data-modos="poligonal">Classe (NBR 13133:2021, Tabela 6) <select id="classe"></select></label>
-          <label class="largo">Estação total <select id="instrumento"></select></label>
+          <label class="largo">Estação total / teodolito <select id="instrumento"></select></label>
           <label>σ do ângulo zenital (") <input id="sigma-z" inputmode="decimal" autocomplete="off"></label>
-          <label>σ da distância: a (mm) <input id="dist-a" inputmode="decimal" autocomplete="off"></label>
-          <label>σ da distância: b (ppm) <input id="dist-b" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="irradiacao poligonal reciprocas">σ da distância: a (mm) <input id="dist-a" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="irradiacao poligonal reciprocas">σ da distância: b (ppm) <input id="dist-b" inputmode="decimal" autocomplete="off"></label>
           <label>σ de i e de s (mm) <input id="sigma-is" inputmode="decimal" autocomplete="off"></label>
-          <label>Curvatura e refração
+          <label data-modos="irradiacao poligonal reciprocas">Curvatura e refração
             <select id="aplicar-cr">
               <option value="auto">Acima do limite (NBR 5.5.3.1)</option>
               <option value="sempre">Sempre</option>
               <option value="nunca">Nunca</option>
             </select>
           </label>
-          <label>Limite para c+r (m) <input id="limiar-cr" inputmode="decimal" autocomplete="off"></label>
-          <label>Raio da Terra R (m) <input id="raio" inputmode="decimal" autocomplete="off"></label>
-          <label>Coeficiente de refração k <input id="coef-k" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="irradiacao poligonal reciprocas">Limite para c+r (m) <input id="limiar-cr" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="irradiacao poligonal reciprocas">Raio da Terra R (m) <input id="raio" inputmode="decimal" autocomplete="off"></label>
+          <label data-modos="irradiacao poligonal reciprocas">Coeficiente de refração k <input id="coef-k" inputmode="decimal" autocomplete="off"></label>
         </form>
       </section>
 
@@ -80,6 +84,7 @@
         <p class="nota" id="ajuda-caderneta"></p>
         <div class="barra-acoes nao-imprimir">
           <button type="button" class="botao botao-secundario" id="bt-adicionar">+ Linha</button>
+          <button type="button" class="botao botao-secundario" id="bt-exemplo" data-modos="taqueometria">Exemplo AA Ex. V</button>
           <button type="button" class="botao botao-secundario" id="bt-limpar">Limpar</button>
           <button type="button" class="botao botao-secundario" id="bt-imprimir">Imprimir</button>
         </div>

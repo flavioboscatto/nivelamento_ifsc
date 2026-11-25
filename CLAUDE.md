@@ -21,7 +21,8 @@ Leia antes de qualquer tarefa:
 - Pendente da etapa 4: G02 e G03 sem dados no projeto (só a tolerância é testada); linha com várias seções/PS é tratada como uma caderneta por seção.
 - **Etapa 5 concluída (aguardando teste manual do professor):** `src/core/trigonometrico.js` (irradiação com Di ou DH, PD/PI, c+r por limiar, σ pela forma geral = F.3, poligonal II N com fechamento, visadas recíprocas), `trigonometrico.html` + `src/ui/paginas/trigonometrico.js`; 50 testes (T01, T03, A01, A04). ET pelas classes da Tabela 2 até chegarem os modelos FOIF/Ruide.
 - Pendente da etapa 5: T02 (Anexo H) sem dados no projeto; T03 3ª visada difere 0,8 mm por arredondamento de c+r na norma (errata E11).
-- **Próxima etapa:** Etapa 6 — taqueometria e estadimetria (Q01 aguarda conferência do professor).
+- **Etapa 6 concluída (aguardando teste manual):** `src/core/taqueometria.js` (estadimetria, DN, H, X, Y, σ do doc 4.5), modo Taqueometria na página trigonométrica com exemplo AA Ex. V; 56 testes (E01, Q01). **Q01 confere com o doc 7, mas os valores esperados ainda precisam da conferência do professor** (apostila sem resposta).
+- **Próxima etapa:** Etapa 7 — estatística de séries.
 - Regra geral: **seguir sempre a NBR 13133:2021** (D23–D27).
 - Aguardando: arquivos de amostra (etapas 9–10); modelos/fichas técnicas dos equipamentos; conferência do caso Q01.
 

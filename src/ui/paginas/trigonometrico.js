@@ -1,6 +1,7 @@
 // paginas/trigonometrico.js — controlador da página de nivelamento trigonométrico (etapa 5).
 // Modos: irradiação, poligonal altimétrica (II N) e visadas recíprocas. Taqueometria: etapa 6.
 import { calcularTrigonometrico, visadasReciprocas, curvaturaRefracao } from '../../core/trigonometrico.js';
+import { calcularTaqueometria } from '../../core/taqueometria.js';
 import { parseAngulo, formatarDms } from '../../core/angulos.js';
 import { parseDecimal, formatar, formatarComSinal } from '../../core/numeros.js';
 import { criarCaderneta } from '../caderneta.js';
@@ -28,6 +29,10 @@ const MODOS = {
     descricao: 'Visadas recíprocas e simultâneas (NBR 13133:2021, 5.5.3.1): obrigatórias acima de 125 m. O desnível é a média ida/volta, calculada sem curvatura e refração, que se cancelam.',
     ajuda: 'Cada linha é um par A→B / B→A. A deve ser a referência ou um ponto já calculado numa linha anterior.',
   },
+  taqueometria: {
+    descricao: 'Taqueometria e estadimetria (classe III N, visada até 80 m): DH = C·S·sen²Z, DN = DH·cot Z + i − FM, com S = FS − FI e C = 100. Com X, Y da estação e Hz, calcula também as coordenadas.',
+    ajuda: 'Linha da estação: nome do ponto ocupado (a referência ou um ponto já calculado), i e, se quiser, o azimute da direção Hz = 0. Depois, uma linha por ponto: FS, FM, FI, Z e Hz.',
+  },
 };
 
 const STATUS = [['', '—'], ['re', 'Ré'], ['vante', 'Vante'], ['irradiado', 'Irad.']];
@@ -52,6 +57,30 @@ const CONFIG = {
       { id: 'cr', rotulo: 'c+r (mm)', titulo: 'Curvatura e refração (entre parênteses quando não aplicada)' },
       { id: 'H', rotulo: 'Cota (m)' },
       { id: 'Hc', rotulo: 'Cota corr. (m)' },
+      { id: 'sigma', rotulo: 'σ (mm)' },
+      { id: 'situacao', rotulo: 'Situação' },
+    ],
+  },
+  taqueometria: {
+    colunas: [
+      { id: 'estacao', rotulo: 'Estação', classe: 'curta' },
+      { id: 'i', rotulo: 'i (m)', numero: true, titulo: 'Altura do instrumento' },
+      { id: 'azref', rotulo: 'Az ref.', titulo: 'Azimute da direção Hz = 0 nesta estação (opcional)' },
+      { id: 'ponto', rotulo: 'Ponto' },
+      { id: 'fs', rotulo: 'FS (m)', numero: true },
+      { id: 'fm', rotulo: 'FM (m)', numero: true },
+      { id: 'fi', rotulo: 'FI (m)', numero: true },
+      { id: 'z', rotulo: 'Z', titulo: 'Ângulo zenital' },
+      { id: 'hz', rotulo: 'Hz', titulo: 'Ângulo horizontal' },
+      { id: 'obs', rotulo: 'Observação', classe: 'longa' },
+    ],
+    calculadas: [
+      { id: 'S', rotulo: 'S (m)', titulo: 'Número gerador FS − FI' },
+      { id: 'DH', rotulo: 'DH (m)' },
+      { id: 'DN', rotulo: 'DN (m)' },
+      { id: 'H', rotulo: 'Cota (m)' },
+      { id: 'X', rotulo: 'X (m)' },
+      { id: 'Y', rotulo: 'Y (m)' },
       { id: 'sigma', rotulo: 'σ (mm)' },
       { id: 'situacao', rotulo: 'Situação' },
     ],
@@ -110,6 +139,7 @@ const CAMPOS = {
   pontoRef: 'ref-ponto', H_ref: 'ref-h', sigmaRef_mm: 'ref-sigma', pontoChegada: 'cheg-ponto', H_chegada: 'cheg-h',
   sigmaChegada_mm: 'cheg-sigma', classe: 'classe', instrumento: 'instrumento', sigmaZ_s: 'sigma-z', distA_mm: 'dist-a',
   distB_ppm: 'dist-b', sigmaIS_mm: 'sigma-is', aplicarCR: 'aplicar-cr', limiarCR_m: 'limiar-cr', R_m: 'raio', k: 'coef-k',
+  X_ref: 'ref-x', Y_ref: 'ref-y', azRef: 'az-ref', sigmaLeit_mm: 'sigma-leit',
 };
 const lerCabecalho = () => Object.fromEntries(Object.entries(CAMPOS).map(([k, id]) => [k, $(id).value]));
 function definirCabecalho(c = {}) {
@@ -137,6 +167,8 @@ function opcoesCalculo(cab) {
     nomeAltura: rotAltura().toLowerCase(), metodo: modo,
     pontoChegada: cab.pontoChegada.trim(), H_chegada: cab.H_chegada, sigmaChegada_m: v(cab.sigmaChegada_mm, 0) / 1000,
     classes: norma.trigonometrico, classeId: cab.classe,
+    X_ref: cab.X_ref, Y_ref: cab.Y_ref, azRef: cab.azRef, sigmaLeit_m: v(cab.sigmaLeit_mm, 1) / 1000,
+    C: norma.alertasPrograma.constanteEstadimetrica, tol3fios_m: norma.alertasPrograma.tolerancia3fios_m,
   };
 }
 
@@ -147,6 +179,7 @@ function recalcular() {
   const op = opcoesCalculo(cab);
   const linhas = caderneta.obterLinhas();
   if (modo === 'reciprocas') mostrarReciprocas(linhas, op);
+  else if (modo === 'taqueometria') mostrarTaqueometria(linhas, { ...op, visadaMax_m: norma.trigonometrico.find((c) => c.id === 'IIIN').visadaMax_m });
   else mostrarNormal(linhas, op);
   mostrarParametros(op);
   salvarRascunho(cab, linhas);
@@ -267,6 +300,41 @@ function mostrarReciprocas(linhas, op) {
     <div><dt>c+r para 125 m (referência)</dt><dd>${formatar(curvaturaRefracao(125, op.R, op.k) * 1000, 1)} mm</dd></div></dl>`;
 }
 
+function mostrarTaqueometria(linhas, op) {
+  const r = calcularTaqueometria(linhas, op);
+  const porIndice = new Map(r.linhas.map((l) => [l.indice, l]));
+  linhas.forEach((_, i) => {
+    const l = porIndice.get(i);
+    if (!l) { caderneta.mostrarLinha(i); return; }
+    const estado = l.erros.length ? 'erro' : l.alertas.length ? 'alerta' : '';
+    if (l.vazia) { caderneta.mostrarLinha(i, { estado, dica: l.erros.join('\n'), valores: { situacao: l.erros.length ? 'Erro' : '' } }); return; }
+    caderneta.mostrarLinha(i, {
+      estado, dica: [...l.erros, ...l.alertas].join('\n'),
+      valores: {
+        S: formatar(l.S, 3), DH: f3(l.DH), DN: formatarComSinal(l.DN, 3), H: f3(l.H), X: f3(l.X), Y: f3(l.Y),
+        sigma: fmm(l.sigma), situacao: l.erros.length ? 'Erro' : l.alertas.length ? 'Alerta' : 'OK',
+      },
+    });
+  });
+  mostrarMensagens(r.erros, r.alertas, r.pontos.length);
+  const rot = rotAltura();
+  const temXY = r.pontos.some((p) => Number.isFinite(p.X));
+  $('tabela-pontos').innerHTML = r.pontos.length ? `
+    <table class="tabela-resultado">
+      <thead><tr><th scope="col">Ponto</th><th scope="col">Estação</th><th scope="col" class="n">DH (m)</th><th scope="col" class="n">DN (m)</th>
+        <th scope="col" class="n">${rot} (m)</th><th scope="col" class="n">σ (mm)</th>
+        ${temXY ? '<th scope="col" class="n">Azimute</th><th scope="col" class="n">X (m)</th><th scope="col" class="n">Y (m)</th>' : ''}</tr></thead>
+      <tbody>${r.pontos.map((p) => `<tr><th scope="row">${esc(p.ponto)}</th><td>${esc(p.estacao)}</td><td class="n">${f3(p.DH)}</td>
+        <td class="n">${formatarComSinal(p.DN, 3)}</td><td class="n"><strong>${f3(p.H)}</strong></td><td class="n">${fmm(p.sigma)}</td>
+        ${temXY ? `<td class="n">${Number.isFinite(p.Az) ? formatarDms(p.Az) : '—'}</td><td class="n">${f3(p.X) || '—'}</td><td class="n">${f3(p.Y) || '—'}</td>` : ''}</tr>`).join('')}</tbody>
+    </table>` : '<p>Digite a caderneta para ver os resultados.</p>';
+  const somaDH = r.pontos.reduce((a, p) => a + p.DH, 0);
+  $('distancias').innerHTML = `<dl class="lista-def"><div><dt>Estações</dt><dd>${r.estacoes.length}</dd></div>
+    <div><dt>Pontos calculados</dt><dd>${r.pontos.length}</dd></div>
+    <div><dt>Soma das DH</dt><dd>${formatar(somaDH, 3)} m</dd></div>
+    <div><dt>Constante estadimétrica C</dt><dd>${formatar(op.C, 0)}</dd></div></dl>`;
+}
+
 function mostrarMensagens(erros, alertas, nPts) {
   $('mensagens').innerHTML = `
     ${erros.length ? `<h3 class="titulo-msg erro">Corrija (${erros.length})</h3><ul class="msgs erro">${erros.map((m) => `<li>${esc(m)}</li>`).join('')}</ul>` : ''}
@@ -304,9 +372,9 @@ function mostrarParametros(op) {
     <div><dt>Norma</dt><dd>${esc(norma.rotulo)}</dd></div>
     <div><dt>Trabalhando com</dt><dd>${tipoAltura() === 'altitude_normal' ? 'Altitude normal (referida ao SGB)' : 'Cota (referência arbitrária)'}</dd></div>
     <div><dt>Estação total</dt><dd>${esc(ins?.rotulo ?? '—')}: σZ = ${formatar(op.sigmaZ_s, 0)}", σD = ${formatar(op.distA_mm, 0)} mm + ${formatar(op.distB_ppm, 0)} ppm (Anexo C)</dd></div>
-    <div><dt>Curvatura e refração</dt><dd>${modo === 'reciprocas' ? 'cancelada pela média das visadas recíprocas' : `(1 − k)·DH²/2R, R = ${formatar(op.R, 0)} m, k = ${formatar(op.k, 2)}, ${crTxt}`}</dd></div>
+    <div><dt>Curvatura e refração</dt><dd>${modo === 'taqueometria' ? 'não aplicada (visadas até 80 m)' : modo === 'reciprocas' ? 'cancelada pela média das visadas recíprocas' : `(1 − k)·DH²/2R, R = ${formatar(op.R, 0)} m, k = ${formatar(op.k, 2)}, ${crTxt}`}</dd></div>
     <div><dt>Distribuição do erro</dt><dd>${modo === 'poligonal' ? 'Proporcional à distância (NBR 13133:2021, 5.5.2.12)' : 'Não se aplica (sem fechamento)'}</dd></div>
-    <div><dt>Propagação</dt><dd>${modo === 'poligonal' ? 'Forma geral por visada (doc 4, 4.4.2), combinando os dois sentidos (4.3.6); Anexo L ao lado' : modo === 'reciprocas' ? 'σ² = ¼ (σ² ida + σ² volta) (doc 4, 4.4.3)' : 'Forma geral por visada; com estação sobre ponto equivale à NBR F.3'}</dd></div>
+    <div><dt>Propagação</dt><dd>${modo === 'taqueometria' ? `Doc 4, 4.5: σS = √2·σleit (σleit = ${formatar(op.sigmaLeit_m * 1000, 1)} mm), σZ e σi` : modo === 'poligonal' ? 'Forma geral por visada (doc 4, 4.4.2), combinando os dois sentidos (4.3.6); Anexo L ao lado' : modo === 'reciprocas' ? 'σ² = ¼ (σ² ida + σ² volta) (doc 4, 4.4.3)' : 'Forma geral por visada; com estação sobre ponto equivale à NBR F.3'}</dd></div>
   </dl>`;
 }
 
@@ -321,7 +389,7 @@ function lerRascunho() {
   return { modo: 'irradiacao', porModo: {} };
 }
 function montarCaderneta() {
-  const cfg = CONFIG[modo === 'reciprocas' ? 'reciprocas' : 'normal'];
+  const cfg = CONFIG[modo] ?? CONFIG.normal;
   caderneta = criarCaderneta({ alvo: $('caderneta'), colunas: cfg.colunas, calculadas: cfg.calculadas, aoMudar: recalcular });
   aplicarRotulosAltura();
 }
@@ -385,6 +453,7 @@ async function iniciar() {
   $('classe').innerHTML = norma.trigonometrico.filter((c) => c.tol_mm_raizK !== null).map((c) => `<option value="${c.id}">${esc(c.rotulo)} — ${c.tol_mm_raizK}√K</option>`).join('');
   $('classe').value = 'IIN-2';
   $('sigma-is').value = '2';
+  $('sigma-leit').value = '1';
   $('limiar-cr').value = formatar(norma.curvRefracaoAcima_m, 0);
   $('raio').value = String(norma.R_m);
   $('coef-k').value = formatar(norma.k, 2);
@@ -409,6 +478,11 @@ async function iniciar() {
   $('bt-adicionar').addEventListener('click', () => caderneta.adicionarLinha());
   $('bt-limpar').addEventListener('click', () => { if (confirm('Apagar todas as linhas da caderneta? O cabeçalho é mantido.')) caderneta.definirLinhas([]); });
   $('bt-imprimir').addEventListener('click', () => window.print());
+  $('bt-exemplo').addEventListener('click', async () => {
+    const ex = await lerJson('../../../data/exemplos/aa_ex5_taqueometria.json');
+    definirCabecalho(ex.cabecalho);
+    caderneta.definirLinhas(ex.linhas);
+  });
 }
 
 iniciar();

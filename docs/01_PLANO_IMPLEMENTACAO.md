@@ -167,8 +167,9 @@ Cada etapa: objetivo, arquivos, critério de aceite e teste manual. **Uma etapa 
 - **Teste manual:** caderneta da Tabela F.2 e Anexo I.
 - **Feito:** caderneta com estação sobre ponto (i) ou estação livre (ré); Z PD/PI; Di ou DH; c+r sempre calculado e aplicado acima de 125 m (editável); σ por visada pela forma geral (4.4.2), igual à F.3 com estação sobre ponto; poligonal fechada ou entre pontos conhecidos, tolerância 120√K / 200√K, distribuição proporcional, σ rigoroso e Anexo L; visadas recíprocas com controle ida + volta ≈ −2·(c+r). T02 (Anexo H) sem dados no repositório; T03 aceita 1 mm na 3ª visada (errata E11).
 
-### Etapa 6 — Taqueometria e estadimetria
+### Etapa 6 — Taqueometria e estadimetria — *concluída em 25/11/2026 (56 testes), aguardando conferência do Q01*
 - **Aceite:** E01 = 9,395 m; Q01 conferido pelo professor.
+- **Feito:** modo Taqueometria em `trigonometrico.html`: estação conhecida com i e azimute da direção Hz = 0; FS/FM/FI, Z, Hz; DH, DN, H, Az, X, Y; σ pela forma do doc 4.5 (σleit = 1 mm, editável); alertas de três fios e visada > 80 m (III N). E01 confere; Q01 reproduz os valores do doc 7 (pendente a conferência do professor).
 
 ### Etapa 7 — Estatística de séries
 - **Aceite:** S01/S02; gráfico igual às Figuras 7 e 8 da AA; detecção do atípico (obs. 7).
